@@ -3,7 +3,7 @@ export type DiscountType = "veteran"|"disability"|"senior"|"frontline"|"lowincom
 export type CoverageLevel = "basic"|"standard"|"premium";
 export type DatacapOption = "yes"|"no";
 export type CommuteType = "loop-only"|"suburb-loop"|"mixed";
-export type InsType = "renters"|"auto"|"health"|"";
+export type InsType = "renters"|"auto"|"health";
 
 export interface MobileBill {
   provider: string; cost: number; data: string;
@@ -15,8 +15,16 @@ export interface InternetBill {
 export interface TransitBill {
   mode: string; cost: number; freq: number; commute: CommuteType;
 }
+// One insurance policy entry
+export interface InsurancePolicy {
+  insType: InsType;
+  cost: number;
+  deductible: number;
+  coverage: CoverageLevel;
+}
+// The bills.insurance field is now an array of up to 3 policies
 export interface InsuranceBill {
-  insType: InsType; cost: number; deductible: number; coverage: CoverageLevel;
+  policies: InsurancePolicy[];
 }
 export interface Bills {
   mobile: MobileBill; internet: InternetBill;

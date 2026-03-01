@@ -9,7 +9,7 @@ import {
   type MobilePlan, type InternetPlan,
 } from "./plans";
 import type {
-  MobileBill, InternetBill, TransitBill, InsuranceBill,
+  MobileBill, InternetBill, TransitBill, InsurancePolicy,
   ComparisonResult, DiscountType, SavingReason,
 } from "@/types";
 
@@ -401,7 +401,7 @@ export function analyzeTransit(
 
 // ── INSURANCE ─────────────────────────────────────────────────
 export function analyzeInsurance(
-  bill: InsuranceBill,
+  bill: InsurancePolicy,
   discMult: number,
   discounts: DiscountType[]
 ): ComparisonResult {

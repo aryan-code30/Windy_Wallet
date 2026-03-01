@@ -1,11 +1,22 @@
 "use client";
 import { useState } from "react";
 import { Card, CardLabel, Eyebrow, PageTitle, Grad, Subtitle, Grid2, Field, Input, Select, Toggle, Notice, BtnRow, Btn } from "./ui";
-import type { FormState } from "@/types";
+import type { FormState, InsurancePolicy, InsType, CoverageLevel } from "@/types";
 
-export default function StepBills({ form, patchBill, onBack, onNext }: {
+const INS_OPTIONS: { type: InsType; icon: string; label: string; desc: string }[] = [
+  { type: "renters", icon: "🏠", label: "Renters Insurance",         desc: "Covers personal property & liability" },
+  { type: "auto",    icon: "🚗", label: "Auto Insurance",            desc: "Vehicle coverage for Chicago drivers" },
+  { type: "health",  icon: "🏥", label: "Health Insurance (ACA)",    desc: "Individual marketplace / ACA plan" },
+];
+
+const BLANK_POLICY = (type: InsType): InsurancePolicy => ({
+  insType: type, cost: 0, deductible: 500, coverage: "standard",
+});
+
+export default function StepBills({ form, patchBill, patchInsurance, onBack, onNext }: {
   form: FormState;
   patchBill: <C extends keyof FormState["bills"]>(cat: C, field: keyof FormState["bills"][C], val: unknown) => void;
+  patchInsurance: (policies: InsurancePolicy[]) => void;
   onBack: () => void; onNext: () => void;
 }) {
   const [err, setErr] = useState("");
@@ -14,9 +25,33 @@ export default function StepBills({ form, patchBill, onBack, onNext }: {
 
   const num = (v: string) => v === "" ? 0 : parseFloat(v);
 
+  // ── insurance helpers ────────────────────────────────
+  const policies = b.insurance.policies;
+  const activeTypes = new Set(policies.map(p => p.insType));
+
+  const toggleInsType = (type: InsType) => {
+    if (activeTypes.has(type)) {
+      patchInsurance(policies.filter(p => p.insType !== type));
+    } else {
+      patchInsurance([...policies, BLANK_POLICY(type)]);
+    }
+  };
+
+  const patchPolicy = (type: InsType, field: keyof InsurancePolicy, val: unknown) => {
+    patchInsurance(policies.map(p =>
+      p.insType === type ? { ...p, [field]: val } : p
+    ));
+  };
+
   const next = () => {
-    const missing = cats.filter(c => !b[c]?.cost || b[c].cost <= 0);
-    if (missing.length) { setErr(`Please enter your monthly cost for: ${missing.join(", ")}`); return; }
+    const missing = cats.filter(c => {
+      if (c === "insurance") {
+        if (policies.length === 0) return true;
+        return policies.some(p => !p.cost || p.cost <= 0);
+      }
+      return !b[c]?.cost || b[c].cost <= 0;
+    });
+    if (missing.length) { setErr(`Please fill in costs for: ${missing.join(", ")}`); return; }
     setErr(""); onNext();
   };
 
@@ -167,49 +202,89 @@ export default function StepBills({ form, patchBill, onBack, onNext }: {
       {cats.includes("insurance") && (
         <Card>
           <CardLabel icon="🛡️">Insurance</CardLabel>
-          <Grid2>
-            <Field label="Insurance Type">
-              <Select value={b.insurance.insType}
-                onChange={e => patchBill("insurance","insType", e.target.value as any)}>
-                <option value="">Select type</option>
-                <option value="renters">Renters Insurance</option>
-                <option value="auto">Auto Insurance</option>
-                <option value="health">Health Insurance (individual ACA)</option>
-              </Select>
-            </Field>
-            <Field label="Monthly Premium" hint="What you pay per month, not the annual">
-              <Input dollar type="number" placeholder="45" min="0" step="0.01"
-                value={b.insurance.cost || ""}
-                onChange={e => patchBill("insurance","cost", num(e.target.value))} />
-            </Field>
-            <Field label="Deductible">
-              <Select value={b.insurance.deductible}
-                onChange={e => patchBill("insurance","deductible", parseInt(e.target.value))}>
-                {[["0","$0 (no deductible)"],["500","$500"],["1000","$1,000"],
-                  ["1500","$1,500"],["2500","$2,500"],["5000","$5,000"]].map(([v,l]) => (
-                  <option key={v} value={v}>{l}</option>
-                ))}
-              </Select>
-            </Field>
-            <Field label="Coverage Level">
-              <Select value={b.insurance.coverage}
-                onChange={e => patchBill("insurance","coverage", e.target.value as any)}>
-                <option value="basic">Basic — minimum required</option>
-                <option value="standard">Standard — balanced coverage</option>
-                <option value="premium">Premium — comprehensive</option>
-              </Select>
-            </Field>
-          </Grid2>
-          {b.insurance.insType === "auto" && (
-            <Notice type="info" icon="🚗" className="mt-4">
-              Loop residents typically drive far fewer miles than average. Usage-based insurance (Root, Progressive Snapshot) often saves Loop drivers 20–35% vs standard policies.
-            </Notice>
+          <p className="text-xs text-gray-400 -mt-3 mb-4 leading-relaxed">
+            Select all the insurance types you currently pay for — you can add up to 3 at once.
+          </p>
+
+          {/* Checkbox selector */}
+          <div className="grid grid-cols-3 gap-2 mb-5">
+            {INS_OPTIONS.map(({ type, icon, label, desc }) => {
+              const active = activeTypes.has(type);
+              return (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => toggleInsType(type)}
+                  className={`rounded-2xl border-2 p-3 text-left transition-all ${
+                    active
+                      ? "border-primary bg-blue-50"
+                      : "border-gray-100 bg-white hover:border-gray-200"
+                  }`}
+                >
+                  <div className="flex items-start justify-between mb-1">
+                    <span className="text-xl">{icon}</span>
+                    <span className={`w-4 h-4 rounded flex items-center justify-center border-2 flex-shrink-0 transition-colors ${
+                      active ? "bg-primary border-primary" : "border-gray-300 bg-white"
+                    }`}>
+                      {active && <span className="text-white text-[10px] font-bold">✓</span>}
+                    </span>
+                  </div>
+                  <p className={`text-[11px] font-bold leading-tight ${active ? "text-primary" : "text-gray-700"}`}>{label}</p>
+                  <p className="text-[10px] text-gray-400 mt-0.5 leading-tight">{desc}</p>
+                </button>
+              );
+            })}
+          </div>
+
+          {policies.length === 0 && (
+            <Notice type="info" icon="☝️">Select at least one insurance type above to enter your details.</Notice>
           )}
-          {b.insurance.insType === "health" && (
-            <Notice type="warning" icon="⚠️" className="mt-4">
-              Health plan rates shown are benchmark rates for a ~35-year-old with no ACA subsidy. If your household income is under $58,000 (single) or $79,000 (couple), you likely qualify for lower rates at healthcare.gov.
-            </Notice>
-          )}
+
+          {/* Per-policy form */}
+          {INS_OPTIONS.filter(o => activeTypes.has(o.type)).map(({ type, icon, label }) => {
+            const policy = policies.find(p => p.insType === type)!;
+            return (
+              <div key={type} className="mt-4 rounded-2xl border border-gray-100 bg-gray-50 p-4">
+                <p className="text-xs font-bold text-gray-700 mb-3 flex items-center gap-2">
+                  <span>{icon}</span> {label}
+                </p>
+                <Grid2>
+                  <Field label="Monthly Premium" hint="What you pay per month">
+                    <Input dollar type="number" placeholder="45" min="0" step="0.01"
+                      value={policy.cost || ""}
+                      onChange={e => patchPolicy(type, "cost", num(e.target.value))} />
+                  </Field>
+                  <Field label="Deductible">
+                    <Select value={policy.deductible}
+                      onChange={e => patchPolicy(type, "deductible", parseInt(e.target.value))}>
+                      {[["0","$0 (no deductible)"],["500","$500"],["1000","$1,000"],
+                        ["1500","$1,500"],["2500","$2,500"],["5000","$5,000"]].map(([v,l]) => (
+                        <option key={v} value={v}>{l}</option>
+                      ))}
+                    </Select>
+                  </Field>
+                  <Field label="Coverage Level" hint="Your current plan tier">
+                    <Select value={policy.coverage}
+                      onChange={e => patchPolicy(type, "coverage", e.target.value as CoverageLevel)}>
+                      <option value="basic">Basic — minimum required</option>
+                      <option value="standard">Standard — balanced coverage</option>
+                      <option value="premium">Premium — comprehensive</option>
+                    </Select>
+                  </Field>
+                </Grid2>
+                {type === "auto" && (
+                  <Notice type="info" icon="🚗" className="mt-3">
+                    Loop residents typically drive fewer miles. Usage-based insurance (Root, Progressive Snapshot) often saves 20–35% vs standard policies.
+                  </Notice>
+                )}
+                {type === "health" && (
+                  <Notice type="warning" icon="⚠️" className="mt-3">
+                    Rates shown are benchmark for ~35yo with no ACA subsidy. Income under $58k (single)? Check healthcare.gov — you likely qualify for lower rates.
+                  </Notice>
+                )}
+              </div>
+            );
+          })}
         </Card>
       )}
 

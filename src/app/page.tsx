@@ -17,7 +17,7 @@ const INITIAL: FormState = {
     mobile:    { provider: "", cost: 0, data: "unlimited", lines: 1, hotspot: false, intl: false },
     internet:  { provider: "", cost: 0, speed: 200, datacap: "no" },
     transit:   { mode: "", cost: 0, freq: 10, commute: "loop-only" },
-    insurance: { insType: "", cost: 0, deductible: 500, coverage: "standard" },
+    insurance: { policies: [] },
   },
   discounts: [], childCount: 1, attested: false,
   month: now.getMonth() + 1,
@@ -45,6 +45,13 @@ export default function Page() {
     setForm(p => ({
       ...p,
       bills: { ...p.bills, [cat]: { ...p.bills[cat], [field]: val } },
+    }));
+
+  // Dedicated helper for the insurance policies array
+  const patchInsurance = (policies: FormState["bills"]["insurance"]["policies"]) =>
+    setForm(p => ({
+      ...p,
+      bills: { ...p.bills, insurance: { policies } },
     }));
 
   const handleAnalyze = async () => {
@@ -98,7 +105,7 @@ export default function Page() {
   const pages = [
     <StepWelcome    key={0} form={form} patch={patch} onNext={() => goTo(1)} />,
     <StepCategories key={1} form={form} patch={patch} onBack={() => goTo(0)} onNext={() => goTo(2)} />,
-    <StepBills      key={2} form={form} patchBill={patchBill} onBack={() => goTo(1)} onNext={() => goTo(3)} />,
+    <StepBills      key={2} form={form} patchBill={patchBill} patchInsurance={patchInsurance} onBack={() => goTo(1)} onNext={() => goTo(3)} />,
     <StepDiscounts  key={3} form={form} patch={patch} onBack={() => goTo(2)} onSubmit={handleAnalyze} />,
     <StepResults    key={4} result={result} loading={loading} error={apiErr} form={form} onBack={() => goTo(2)} onReset={reset} />,
   ];
