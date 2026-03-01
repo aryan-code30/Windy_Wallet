@@ -588,64 +588,131 @@ export default function StepResults({ result, loading, error, form, onBack, onRe
           const utilities = parseFloat(form.budget.utilities) || 0;
           const personal  = parseFloat(form.budget.personal)  || 0;
           const other     = parseFloat(form.budget.other)     || 0;
-          const billsTotal = results.reduce((sum, r) => sum + r.currentCost, 0);
-          const afterSavings = billsTotal - totalMonthlySavings;
+
+          // Bills currently paid vs. after WindyWallet savings
+          const billsTotal      = results.reduce((sum, r) => sum + r.currentCost, 0);
+          const billsAfter      = billsTotal - totalMonthlySavings;
+
+          // Total known outgoing expenses (non-bill categories entered in Step 1)
+          const knownExpenses   = utilities + personal + other;
+
+          // Full picture: start from budget, deduct all known expenses + optimised bills
+          const totalSpend      = knownExpenses + billsTotal;           // before WW
+          const totalSpendAfter = knownExpenses + billsAfter;           // after WW
+          const leftOver        = total > 0 ? total - totalSpendAfter : null;
+          const leftOverBefore  = total > 0 ? total - totalSpend       : null;
+
           const hasBudget = total > 0 || utilities > 0 || personal > 0 || other > 0;
+
+          // width helper for mini progress bars (cap at 100%)
+          const pct = (val: number, max: number) =>
+            max > 0 ? Math.min(100, (val / max) * 100).toFixed(1) : "0";
+
           return (
             <div className="rounded-2xl border border-gray-100 bg-white shadow-sm flex flex-col">
               {/* Header */}
               <div className="px-5 pt-5 pb-3 border-b border-gray-50">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Monthly Budget</p>
-                <p className="text-[11px] text-gray-400 mt-0.5">Your expense totals at a glance</p>
+                <p className="text-[11px] text-gray-400 mt-0.5">Where your money goes — before &amp; after</p>
               </div>
 
-              {/* Rows */}
-              <div className="flex-1 px-5 py-3 space-y-2.5">
+              <div className="flex-1 px-5 py-4 space-y-3">
                 {hasBudget ? (
                   <>
-                    {[
-                      { icon: "💼", label: "Total Budget",     val: total,     cls: "text-gray-800" },
-                      { icon: "⚡", label: "Utility Bills",    val: utilities,  cls: "text-blue-600" },
-                      { icon: "🛍", label: "Personal",         val: personal,   cls: "text-violet-600" },
-                      { icon: "📦", label: "Other",            val: other,      cls: "text-gray-500" },
-                    ].map(({ icon, label, val, cls }) => val > 0 && (
-                      <div key={label} className="flex items-center justify-between">
+                    {/* ── TOTAL BUDGET ── */}
+                    {total > 0 && (
+                      <div className="flex items-center justify-between pb-2 border-b border-gray-50">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm">{icon}</span>
-                          <span className="text-xs text-gray-500 font-medium">{label}</span>
+                          <span className="text-sm">💼</span>
+                          <span className="text-xs font-bold text-gray-700">Total Budget</span>
                         </div>
-                        <span className={`text-sm font-bold ${cls}`}>${val.toLocaleString()}</span>
+                        <span className="text-sm font-extrabold text-gray-800">${total.toLocaleString()}</span>
+                      </div>
+                    )}
+
+                    {/* ── EXPENSE ROWS with deduction arrows ── */}
+                    <p className="text-[9px] font-bold uppercase tracking-widest text-gray-300 -mb-1">Expenses deducted</p>
+
+                    {[
+                      { icon: "⚡", label: "Utility Bills",   val: utilities, cls: "text-blue-600",   bar: "bg-blue-200"   },
+                      { icon: "🛍", label: "Personal",        val: personal,  cls: "text-violet-600", bar: "bg-violet-200" },
+                      { icon: "📦", label: "Other",           val: other,     cls: "text-gray-500",   bar: "bg-gray-200"   },
+                    ].map(({ icon, label, val, cls, bar }) => val > 0 && (
+                      <div key={label}>
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs text-gray-300">−</span>
+                            <span className="text-sm">{icon}</span>
+                            <span className="text-xs text-gray-500">{label}</span>
+                          </div>
+                          <span className={`text-xs font-bold ${cls}`}>${val.toLocaleString()}</span>
+                        </div>
+                        {total > 0 && (
+                          <div className="w-full bg-gray-100 rounded-full h-1">
+                            <div className={`${bar} h-1 rounded-full`} style={{ width: `${pct(val, total)}%` }} />
+                          </div>
+                        )}
                       </div>
                     ))}
 
-                    {/* Divider */}
-                    <div className="border-t border-dashed border-gray-100 pt-2.5 mt-1 space-y-2">
+                    {/* ── BILLS: before vs after ── */}
+                    <div className="rounded-xl bg-gray-50 border border-gray-100 p-3 space-y-2">
+                      <p className="text-[9px] font-bold uppercase tracking-widest text-gray-300">Your bills</p>
+
+                      {/* Before */}
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm">📋</span>
-                          <span className="text-xs text-gray-500 font-medium">Current Bills Total</span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs text-gray-300">−</span>
+                          <span className="text-xs text-gray-500">Bills (before)</span>
                         </div>
-                        <span className="text-sm font-bold text-gray-700">${billsTotal.toFixed(2)}</span>
+                        <span className="text-xs font-bold text-red-400 line-through">${billsTotal.toFixed(2)}</span>
                       </div>
+
+                      {/* WindyWallet saving */}
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm">✅</span>
-                          <span className="text-xs text-gray-500 font-medium">After Savings</span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs text-emerald-500">↓</span>
+                          <span className="text-xs text-emerald-600 font-semibold">WindyWallet saves</span>
                         </div>
-                        <span className="text-sm font-bold text-emerald-600">${afterSavings.toFixed(2)}</span>
+                        <span className="text-xs font-bold text-emerald-600">−${totalMonthlySavings.toFixed(2)}</span>
                       </div>
-                      {total > 0 && (
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm">📊</span>
-                            <span className="text-xs text-gray-500 font-medium">Bills % of Budget</span>
-                          </div>
-                          <span className="text-sm font-bold text-amber-600">
-                            {((billsTotal / total) * 100).toFixed(1)}%
+
+                      {/* After */}
+                      <div className="flex items-center justify-between border-t border-gray-200 pt-1.5">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs text-gray-300">−</span>
+                          <span className="text-xs font-bold text-gray-700">Bills (after)</span>
+                        </div>
+                        <span className="text-xs font-extrabold text-gray-800">${billsAfter.toFixed(2)}</span>
+                      </div>
+                    </div>
+
+                    {/* ── LEFT OVER ── */}
+                    {total > 0 && (
+                      <div className="rounded-xl border-2 border-dashed border-emerald-200 bg-emerald-50 p-3">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Remaining (before)</span>
+                          <span className="text-xs font-bold text-gray-400">
+                            {leftOverBefore !== null && leftOverBefore >= 0
+                              ? `$${leftOverBefore.toFixed(2)}`
+                              : <span className="text-red-400">Over budget</span>}
                           </span>
                         </div>
-                      )}
-                    </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600">Remaining (after WW)</span>
+                          <span className="text-sm font-extrabold text-emerald-600">
+                            {leftOver !== null && leftOver >= 0
+                              ? `$${leftOver.toFixed(2)}`
+                              : <span className="text-red-400">Over budget</span>}
+                          </span>
+                        </div>
+                        {leftOver !== null && leftOverBefore !== null && leftOver > leftOverBefore && (
+                          <p className="text-[10px] text-emerald-500 font-semibold mt-1.5">
+                            ↑ ${(leftOver - leftOverBefore).toFixed(2)} more in your pocket each month
+                          </p>
+                        )}
+                      </div>
+                    )}
                   </>
                 ) : (
                   <div className="flex flex-col items-center justify-center h-full py-6 text-center">
@@ -657,11 +724,15 @@ export default function StepResults({ result, loading, error, form, onBack, onRe
                 )}
               </div>
 
-              {/* Footer savings pill */}
-              <div className="px-5 pb-5 pt-2">
+              {/* Footer: total spend comparison */}
+              <div className="px-5 pb-5 pt-1 space-y-2">
+                <div className="bg-white border border-gray-100 rounded-xl px-4 py-2.5 flex items-center justify-between">
+                  <span className="text-[11px] text-gray-400 font-semibold">Total spend before</span>
+                  <span className="text-sm font-bold text-red-400 line-through">${totalSpend.toFixed(2)}</span>
+                </div>
                 <div className="bg-emerald-50 rounded-xl px-4 py-2.5 flex items-center justify-between">
-                  <span className="text-[11px] font-bold text-emerald-700 uppercase tracking-wide">You save</span>
-                  <span className="text-base font-extrabold text-emerald-600">${totalMonthlySavings.toFixed(2)}<span className="text-xs font-semibold text-emerald-400">/mo</span></span>
+                  <span className="text-[11px] font-bold text-emerald-700 uppercase tracking-wide">Total spend after</span>
+                  <span className="text-base font-extrabold text-emerald-600">${totalSpendAfter.toFixed(2)}<span className="text-xs font-semibold text-emerald-400">/mo</span></span>
                 </div>
               </div>
             </div>
