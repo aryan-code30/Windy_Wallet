@@ -8,6 +8,7 @@ import StepDiscounts from "@/components/StepDiscounts";
 import StepResults from "@/components/StepResults";
 import type { FormState, AnalyzeResponse } from "@/types";
 
+const now = new Date();
 const INITIAL: FormState = {
   zip: "", address: "",
   budget: { total: "", utilities: "", personal: "", other: "" },
@@ -19,6 +20,8 @@ const INITIAL: FormState = {
     insurance: { insType: "", cost: 0, deductible: 500, coverage: "standard" },
   },
   discounts: [], childCount: 1, attested: false,
+  month: now.getMonth() + 1,
+  year:  now.getFullYear(),
 };
 
 export default function Page() {
@@ -78,6 +81,9 @@ export default function Page() {
           totalSavings: data.totalMonthlySavings,
           annualSavings: data.totalAnnualSavings,
           optimizedCount: data.results?.filter((r: any) => !r.alreadyOptimal).length ?? 0,
+          month: form.month,
+          year:  form.year,
+          billsSnapshot: form.bills,
         }),
       }).catch(() => {});
     } catch (e: any) {

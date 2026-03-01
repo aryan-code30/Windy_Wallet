@@ -15,5 +15,8 @@ model Submission {
   totalSavings   Float    @default(0)
   annualSavings  Float    @default(0)
   optimizedCount Int      @default(0)
+  month          Int      @default(1)   // 1-12
+  year           Int      @default(2026)
+  billsSnapshot  String   @default("{}") // JSON stringified bill data
   createdAt      DateTime @default(now())
 }

@@ -74,4 +74,20 @@ export interface FormState {
   discounts: DiscountType[];
   childCount: number;
   attested: boolean;
+  month: number;   // 1-12
+  year: number;    // e.g. 2026
+}
+
+export interface MonthlyRecord {
+  id: string;
+  zip: string;
+  month: number;
+  year: number;
+  categories: string[];
+  discounts: string[];
+  totalSavings: number;
+  annualSavings: number;
+  optimizedCount: number;
+  billsSnapshot: Record<string, any>;
+  createdAt: string;
 }

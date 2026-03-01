@@ -101,6 +101,38 @@ export default function StepWelcome({ form, patch, onNext }: {
         </Grid2>
       </Card>
 
+      {/* Month / Year */}
+      <Card>
+        <CardLabel icon="📅">Analysis Period</CardLabel>
+        <p className="text-xs text-gray-400 mb-4 -mt-3 leading-relaxed">
+          Choose the month and year this analysis should be saved under for your history.
+        </p>
+        <Grid2>
+          <Field label="Month">
+            <select
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+              value={form.month}
+              onChange={e => patch("month", Number(e.target.value))}
+            >
+              {["January","February","March","April","May","June","July","August","September","October","November","December"].map((name, i) => (
+                <option key={i + 1} value={i + 1}>{name}</option>
+              ))}
+            </select>
+          </Field>
+          <Field label="Year">
+            <select
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+              value={form.year}
+              onChange={e => patch("year", Number(e.target.value))}
+            >
+              {[2024, 2025, 2026, 2027].map(y => (
+                <option key={y} value={y}>{y}</option>
+              ))}
+            </select>
+          </Field>
+        </Grid2>
+      </Card>
+
       {/* Budget */}
       <Card>
         <CardLabel icon="💰">Monthly Budget Overview</CardLabel>

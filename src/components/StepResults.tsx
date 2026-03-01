@@ -1,7 +1,10 @@
 "use client";
 import { useState } from "react";
 import { Eyebrow, PageTitle, Grad, Notice, Skeleton, BtnRow, Btn } from "./ui";
+import MonthlyHistory from "./MonthlyHistory";
 import type { AnalyzeResponse, ComparisonResult, FormState, DiscountType } from "@/types";
+
+const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
 // ── Skeleton loading state ────────────────────────────
 function ResultsSkeleton() {
@@ -542,6 +545,9 @@ export default function StepResults({ result, loading, error, form, onBack, onRe
     <div className="animate-fade-up">
       <Eyebrow>Step 4 of 4 — Your Results</Eyebrow>
       <PageTitle>Your savings <Grad>breakdown</Grad></PageTitle>
+      <p className="text-xs font-semibold text-blue-500 bg-blue-50 inline-flex items-center gap-1.5 px-3 py-1 rounded-full mb-4">
+        📅 Saved for {MONTH_NAMES[(form.month ?? 1) - 1]} {form.year ?? new Date().getFullYear()}
+      </p>
 
       {/* ── Hero ── */}
       <div className="rounded-2xl p-10 mb-6 text-white relative overflow-hidden"
@@ -712,6 +718,9 @@ export default function StepResults({ result, loading, error, form, onBack, onRe
           </div>
         )}
       </div>
+
+      {/* ── Monthly History ── */}
+      <MonthlyHistory />
 
       {/* ── Action bar ── */}
       <div className="flex flex-wrap items-center justify-between gap-3 mt-8 pt-6 border-t border-gray-100">
