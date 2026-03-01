@@ -1,0 +1,5 @@
+# Help GitHub detect languages correctly
+*.prisma linguist-language=Prisma
+*.md linguist-documentation=false
+*.json linguist-generated=false
+package-lock.json linguist-generated=true
