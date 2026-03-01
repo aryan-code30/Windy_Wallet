@@ -19,7 +19,7 @@ const schema = z.object({
       })).default([]),
     }).optional(),
   }),
-  discounts: z.array(z.enum(["veteran","disability","senior","frontline","lowincome","child"])).default([]),
+  discounts: z.array(z.enum(["veteran","disability","senior","frontline","lowincome","child","none"])).default([]),
   childCount: z.number().default(1),
   budget: z.object({ total: z.string().optional() }).optional(),
 });
