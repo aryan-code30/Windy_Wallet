@@ -605,7 +605,7 @@ function CompCard({ r, idx }: { r: ComparisonResult; idx: number }) {
 // ── Main Results page ─────────────────────────────────
 const DISC_LABELS: Record<DiscountType, string> = {
   veteran:"Veteran", disability:"Disability", senior:"Senior",
-  frontline:"Frontline Worker", lowincome:"Income-Qualified", child:"Family",
+  frontline:"Frontline Worker", lowincome:"Income-Qualified", child:"Family", none:"No Discount",
 };
 
 interface Props {
@@ -717,151 +717,119 @@ export default function StepResults({ result, loading, error, form, onBack, onRe
           const personal  = parseFloat(form.budget.personal)  || 0;
           const other     = parseFloat(form.budget.other)     || 0;
 
-          // Bills currently paid vs. after WindyWallet savings
-          const billsTotal      = results.reduce((sum, r) => sum + r.currentCost, 0);
-          const billsAfter      = billsTotal - totalMonthlySavings;
-
-          // Total known outgoing expenses (non-bill categories entered in Step 1)
+          const billsBefore     = results.reduce((sum, r) => sum + r.currentCost, 0);
           const knownExpenses   = utilities + personal + other;
+          const totalBefore     = knownExpenses + billsBefore;
+          const totalAfter      = knownExpenses + (billsBefore - totalMonthlySavings);
+          const remaining       = total > 0 ? total - totalAfter : null;
+          const hasBudget       = total > 0 || knownExpenses > 0;
 
-          // Full picture: start from budget, deduct all known expenses + optimised bills
-          const totalSpend      = knownExpenses + billsTotal;           // before WW
-          const totalSpendAfter = knownExpenses + billsAfter;           // after WW
-          const leftOver        = total > 0 ? total - totalSpendAfter : null;
-          const leftOverBefore  = total > 0 ? total - totalSpend       : null;
+          // bar width helper
+          const pct = (v: number) => total > 0 ? Math.min(100, (v / total) * 100).toFixed(1) : "0";
 
-          const hasBudget = total > 0 || utilities > 0 || personal > 0 || other > 0;
-
-          // width helper for mini progress bars (cap at 100%)
-          const pct = (val: number, max: number) =>
-            max > 0 ? Math.min(100, (val / max) * 100).toFixed(1) : "0";
+          const expenseRows = [
+            { icon: "⚡", label: "Utilities",  val: utilities, bar: "bg-blue-300"   },
+            { icon: "🛍️", label: "Personal",   val: personal,  bar: "bg-violet-300" },
+            { icon: "📦", label: "Other",      val: other,     bar: "bg-gray-300"   },
+            { icon: "📋", label: "Bills",      val: billsBefore - totalMonthlySavings, bar: "bg-emerald-300" },
+          ].filter(r => r.val > 0);
 
           return (
             <div className="rounded-2xl border border-gray-100 bg-white shadow-sm flex flex-col">
               {/* Header */}
-              <div className="px-5 pt-5 pb-3 border-b border-gray-50">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Monthly Budget</p>
-                <p className="text-[11px] text-gray-400 mt-0.5">Where your money goes — before &amp; after</p>
-              </div>
-
-              <div className="flex-1 px-5 py-4 space-y-3">
-                {hasBudget ? (
-                  <>
-                    {/* ── TOTAL BUDGET ── */}
-                    {total > 0 && (
-                      <div className="flex items-center justify-between pb-2 border-b border-gray-50">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm">💼</span>
-                          <span className="text-xs font-bold text-gray-700">Total Budget</span>
-                        </div>
-                        <span className="text-sm font-extrabold text-gray-800">${total.toLocaleString()}</span>
-                      </div>
-                    )}
-
-                    {/* ── EXPENSE ROWS with deduction arrows ── */}
-                    <p className="text-[9px] font-bold uppercase tracking-widest text-gray-300 -mb-1">Expenses deducted</p>
-
-                    {[
-                      { icon: "⚡", label: "Utility Bills",   val: utilities, cls: "text-blue-600",   bar: "bg-blue-200"   },
-                      { icon: "🛍", label: "Personal",        val: personal,  cls: "text-violet-600", bar: "bg-violet-200" },
-                      { icon: "📦", label: "Other",           val: other,     cls: "text-gray-500",   bar: "bg-gray-200"   },
-                    ].map(({ icon, label, val, cls, bar }) => val > 0 && (
-                      <div key={label}>
-                        <div className="flex items-center justify-between mb-1">
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-xs text-gray-300">−</span>
-                            <span className="text-sm">{icon}</span>
-                            <span className="text-xs text-gray-500">{label}</span>
-                          </div>
-                          <span className={`text-xs font-bold ${cls}`}>${val.toLocaleString()}</span>
-                        </div>
-                        {total > 0 && (
-                          <div className="w-full bg-gray-100 rounded-full h-1">
-                            <div className={`${bar} h-1 rounded-full`} style={{ width: `${pct(val, total)}%` }} />
-                          </div>
-                        )}
-                      </div>
-                    ))}
-
-                    {/* ── BILLS: before vs after ── */}
-                    <div className="rounded-xl bg-gray-50 border border-gray-100 p-3 space-y-2">
-                      <p className="text-[9px] font-bold uppercase tracking-widest text-gray-300">Your bills</p>
-
-                      {/* Before */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-xs text-gray-300">−</span>
-                          <span className="text-xs text-gray-500">Bills (before)</span>
-                        </div>
-                        <span className="text-xs font-bold text-red-400 line-through">${billsTotal.toFixed(2)}</span>
-                      </div>
-
-                      {/* WindyWallet saving */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-xs text-emerald-500">↓</span>
-                          <span className="text-xs text-emerald-600 font-semibold">WindyWallet saves</span>
-                        </div>
-                        <span className="text-xs font-bold text-emerald-600">−${totalMonthlySavings.toFixed(2)}</span>
-                      </div>
-
-                      {/* After */}
-                      <div className="flex items-center justify-between border-t border-gray-200 pt-1.5">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-xs text-gray-300">−</span>
-                          <span className="text-xs font-bold text-gray-700">Bills (after)</span>
-                        </div>
-                        <span className="text-xs font-extrabold text-gray-800">${billsAfter.toFixed(2)}</span>
-                      </div>
-                    </div>
-
-                    {/* ── LEFT OVER ── */}
-                    {total > 0 && (
-                      <div className="rounded-xl border-2 border-dashed border-emerald-200 bg-emerald-50 p-3">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Remaining (before)</span>
-                          <span className="text-xs font-bold text-gray-400">
-                            {leftOverBefore !== null && leftOverBefore >= 0
-                              ? `$${leftOverBefore.toFixed(2)}`
-                              : <span className="text-red-400">Over budget</span>}
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600">Remaining (after WW)</span>
-                          <span className="text-sm font-extrabold text-emerald-600">
-                            {leftOver !== null && leftOver >= 0
-                              ? `$${leftOver.toFixed(2)}`
-                              : <span className="text-red-400">Over budget</span>}
-                          </span>
-                        </div>
-                        {leftOver !== null && leftOverBefore !== null && leftOver > leftOverBefore && (
-                          <p className="text-[10px] text-emerald-500 font-semibold mt-1.5">
-                            ↑ ${(leftOver - leftOverBefore).toFixed(2)} more in your pocket each month
-                          </p>
-                        )}
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <div className="flex flex-col items-center justify-center h-full py-6 text-center">
-                    <span className="text-3xl mb-2">💰</span>
-                    <p className="text-xs text-gray-400 leading-relaxed">
-                      No budget entered.<br />Go back to Step 1 to add your monthly expenses.
-                    </p>
+              <div className="px-5 pt-4 pb-3 border-b border-gray-50 flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Monthly Budget</p>
+                  {total > 0 && (
+                    <p className="text-xl font-extrabold text-gray-800 mt-0.5">${total.toLocaleString()}</p>
+                  )}
+                </div>
+                {total > 0 && remaining !== null && (
+                  <div className={`text-right ${remaining >= 0 ? "text-emerald-600" : "text-red-500"}`}>
+                    <p className="text-[10px] font-bold uppercase tracking-wide opacity-60">Left over</p>
+                    <p className="text-lg font-extrabold">${Math.abs(remaining).toFixed(0)}</p>
+                    {remaining < 0 && <p className="text-[9px] font-bold text-red-400">over budget</p>}
                   </div>
                 )}
               </div>
 
-              {/* Footer: total spend comparison */}
-              <div className="px-5 pb-5 pt-1 space-y-2">
-                <div className="bg-white border border-gray-100 rounded-xl px-4 py-2.5 flex items-center justify-between">
-                  <span className="text-[11px] text-gray-400 font-semibold">Total spend before</span>
-                  <span className="text-sm font-bold text-red-400 line-through">${totalSpend.toFixed(2)}</span>
-                </div>
-                <div className="bg-emerald-50 rounded-xl px-4 py-2.5 flex items-center justify-between">
-                  <span className="text-[11px] font-bold text-emerald-700 uppercase tracking-wide">Total spend after</span>
-                  <span className="text-base font-extrabold text-emerald-600">${totalSpendAfter.toFixed(2)}<span className="text-xs font-semibold text-emerald-400">/mo</span></span>
-                </div>
+              <div className="flex-1 px-5 py-4">
+                {hasBudget ? (
+                  <div className="space-y-4">
+
+                    {/* Stacked spend bar */}
+                    {total > 0 && (
+                      <div>
+                        <div className="flex rounded-full overflow-hidden h-2.5 bg-gray-100 gap-px">
+                          {expenseRows.map(r => (
+                            <div key={r.label} className={`${r.bar} h-full`} style={{ width: `${pct(r.val)}%` }} />
+                          ))}
+                        </div>
+                        <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2">
+                          {expenseRows.map(r => (
+                            <div key={r.label} className="flex items-center gap-1">
+                              <div className={`w-2 h-2 rounded-full ${r.bar}`} />
+                              <span className="text-[10px] text-gray-400">{r.label}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Expense breakdown — compact rows */}
+                    <div className="space-y-1.5">
+                      {[
+                        { icon: "⚡", label: "Utilities",  val: utilities },
+                        { icon: "🛍️", label: "Personal",   val: personal  },
+                        { icon: "📦", label: "Other",      val: other     },
+                      ].filter(r => r.val > 0).map(r => (
+                        <div key={r.label} className="flex items-center justify-between">
+                          <span className="text-xs text-gray-400 flex items-center gap-1.5">
+                            <span>{r.icon}</span>{r.label}
+                          </span>
+                          <span className="text-xs font-semibold text-gray-600">${r.val.toLocaleString()}</span>
+                        </div>
+                      ))}
+
+                      {/* Bills row with savings inline */}
+                      <div className="rounded-xl bg-gray-50 border border-gray-100 px-3 py-2.5 mt-1 space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-gray-400">📋 Bills</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-red-400 line-through">${billsBefore.toFixed(2)}</span>
+                            <span className="text-xs font-bold text-gray-700">${(billsBefore - totalMonthlySavings).toFixed(2)}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1">
+                            <span>✦</span> WindyWallet saves
+                          </span>
+                          <span className="text-[11px] font-bold text-emerald-600">−${totalMonthlySavings.toFixed(2)}/mo</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Bottom totals */}
+                    <div className="border-t border-gray-100 pt-3 space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-gray-400">Total spend before</span>
+                        <span className="text-xs font-semibold text-red-400 line-through">${totalBefore.toFixed(2)}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-gray-700">Total spend after</span>
+                        <span className="text-sm font-extrabold text-emerald-600">${totalAfter.toFixed(2)}<span className="text-[10px] font-medium text-emerald-400">/mo</span></span>
+                      </div>
+                    </div>
+
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-8 text-center">
+                    <span className="text-3xl mb-2">💰</span>
+                    <p className="text-xs text-gray-400 leading-relaxed">
+                      No budget entered.<br />Add expenses in Step 1.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           );
