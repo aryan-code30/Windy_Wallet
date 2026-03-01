@@ -1,0 +1,19 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./windywallet.db"
+}
+
+model Submission {
+  id             String   @id @default(cuid())
+  zip            String
+  categories     String
+  discounts      String
+  totalSavings   Float    @default(0)
+  annualSavings  Float    @default(0)
+  optimizedCount Int      @default(0)
+  createdAt      DateTime @default(now())
+}
