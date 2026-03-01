@@ -141,54 +141,67 @@ export default function MonthlyHistory() {
               {/* ── Expanded entries ── */}
               {isOpen && (
                 <div className="border-t border-gray-100 divide-y divide-gray-50">
-                  {group.entries.map((entry) => {
+                  {group.entries.map((entry, idx) => {
                     const isDeletingEntry = deleting === entry.id;
                     const isConfirmEntry  = confirmKey === entry.id;
                     return (
-                      <div key={entry.id} className="px-5 py-4">
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex gap-1.5 flex-wrap">
-                            {entry.categories.map((cat: string) => (
-                              <span key={cat} className="bg-blue-50 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide">
-                                {CATEGORY_ICONS[cat] ?? "•"} {cat}
-                              </span>
-                            ))}
-                          </div>
-                          <div className="flex items-center gap-2 flex-shrink-0 ml-2">
-                            <span className="text-xs text-gray-400">
-                              {new Date(entry.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                            </span>
+                      <div key={entry.id} className={`px-5 py-4 transition-colors ${isConfirmEntry ? "bg-red-50" : "hover:bg-gray-50"}`}>
 
-                            {/* Delete single entry */}
-                            {isConfirmEntry ? (
-                              <div className="flex items-center gap-1">
-                                <button
-                                  onClick={() => deleteEntry(entry.id)}
-                                  disabled={isDeletingEntry}
-                                  className="text-[11px] font-bold text-white bg-red-500 hover:bg-red-600 px-2 py-0.5 rounded-lg transition-colors disabled:opacity-50"
-                                >
-                                  {isDeletingEntry ? "…" : "Delete"}
-                                </button>
-                                <button
-                                  onClick={() => setConfirmKey(null)}
-                                  className="text-[11px] text-gray-400 hover:text-gray-600 px-1.5 py-0.5 rounded-lg transition-colors"
-                                >
-                                  Cancel
-                                </button>
-                              </div>
-                            ) : (
-                              <button
-                                onClick={() => setConfirmKey(entry.id)}
-                                className="w-6 h-6 flex items-center justify-center rounded-lg text-gray-300 hover:text-red-400 hover:bg-red-50 transition-colors text-xs"
-                                title="Delete this entry"
-                              >
-                                🗑
-                              </button>
-                            )}
+                        {/* ── Row header: number + date + DELETE ── */}
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2.5">
+                            {/* Submission number badge */}
+                            <div className="w-7 h-7 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                              <span className="text-[11px] font-extrabold text-blue-600">#{idx + 1}</span>
+                            </div>
+                            <div>
+                              <p className="text-xs font-bold text-gray-700">Submission #{idx + 1}</p>
+                              <p className="text-[10px] text-gray-400">
+                                {new Date(entry.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                              </p>
+                            </div>
                           </div>
+
+                          {/* Delete controls */}
+                          {isConfirmEntry ? (
+                            <div className="flex items-center gap-2">
+                              <span className="text-[11px] text-red-500 font-semibold">Delete this?</span>
+                              <button
+                                onClick={() => deleteEntry(entry.id)}
+                                disabled={isDeletingEntry}
+                                className="text-[11px] font-bold text-white bg-red-500 hover:bg-red-600 active:bg-red-700 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+                              >
+                                {isDeletingEntry ? "Deleting…" : "Yes, delete"}
+                              </button>
+                              <button
+                                onClick={() => setConfirmKey(null)}
+                                className="text-[11px] font-semibold text-gray-500 hover:text-gray-700 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg transition-colors"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => setConfirmKey(entry.id)}
+                              disabled={!!deleting}
+                              className="flex items-center gap-1.5 text-[11px] font-semibold text-gray-400 hover:text-red-500 hover:bg-red-50 border border-gray-100 hover:border-red-100 px-2.5 py-1.5 rounded-lg transition-all disabled:opacity-40"
+                            >
+                              <span>🗑</span> Delete
+                            </button>
+                          )}
                         </div>
 
-                        <div className="grid grid-cols-3 gap-2 mt-2">
+                        {/* ── Category pills ── */}
+                        <div className="flex gap-1.5 flex-wrap mb-3">
+                          {entry.categories.map((cat: string) => (
+                            <span key={cat} className="bg-blue-50 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide">
+                              {CATEGORY_ICONS[cat] ?? "•"} {cat}
+                            </span>
+                          ))}
+                        </div>
+
+                        {/* ── Stats row ── */}
+                        <div className="grid grid-cols-3 gap-2">
                           <div className="bg-emerald-50 rounded-xl p-2.5 text-center">
                             <div className="text-base font-bold text-emerald-600">${entry.totalSavings.toFixed(0)}</div>
                             <div className="text-[10px] text-gray-400 mt-0.5">monthly</div>
