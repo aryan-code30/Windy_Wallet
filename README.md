@@ -1,71 +1,76 @@
-# 🌬 WindyWallet v3
-### Chicago Loop Bill Optimizer — Built for Real People, Not Demo Portfolios
+# 🌬 WindyWallet
+### Chicago Loop Bill Optimizer with Local Savings Ideas
 
-> Built as if you live at 233 S Wacker Dr and are tired of overpaying.
-
----
-
-## What Changed in v3
-
-### Logic & Accuracy
-- **Mobile**: Only recommends plans that meet ALL your requirements (hotspot, intl, data, lines). Explains WHY the recommended plan works — network, coverage, caveats.
-- **Internet**: Compares TRUE cost (monthly + equipment fee). Won't recommend anything below 60% of your current speed. Prefers plans with adequate upload speed for WFH.
-- **Transit**: Real CTA break-even math ($105 pass ÷ $2.25/ride = 46.7 rides/month threshold). Suburb-to-Loop commuters get Metra logic. Rideshare users get the hard truth.
-- **Insurance**: Never downgrades your coverage tier. Auto insurance surfaces usage-based options — Loop drivers average far fewer miles than the national average.
-- **Discounts**: Based on real programs (Mint Military, T-Mobile First Responder, CTA Reduced Fare, Comcast Internet Essentials, ACA APTC credits). Shows which specific programs each discount unlocks.
-
-### UX Improvements
-- **Progress bar** in the header — real % completion, not just dots
-- **Skeleton loading screens** — results page shows exact layout while analyzing
-- **"Why this saves you money"** — every recommendation now explains the reasoning with impact levels (high/medium/low)
-- **"Already optimal" explanations** — tells you exactly WHY your current plan is competitive, not just a generic message
-- **Discount preview** — shows combined discount % live as you select eligible groups
-- **Print + Copy Summary** buttons on results
-- **Warnings** — e.g. "Xfinity promotional rate expires after 12 months — set a reminder"
-- **Clickable ZIP shortcuts** on welcome screen
-- Data freshness timestamp on every result card
-
-### Data Quality
-- Every plan has `notes[]` — multiple honest observations, not marketing copy
-- `bestFor` field — who this plan is actually right for
-- `caveats` — what the plan doesn't tell you upfront
-- Transit data includes real CTA/Metra 2024 fare tables with break-even calculations
-- Health insurance notes explicitly flag ACA subsidy eligibility
+> A Next.js application that analyzes your bills and suggests savings opportunities, plus Chicago Loop-specific money-saving spots.
 
 ---
 
-## Stack
+## Key Features
 
-| Layer       | Tech                        |
-|-------------|-----------------------------|
-| Framework   | Next.js 14 (App Router)     |
-| Language    | TypeScript (strict mode)    |
-| Styling     | Tailwind CSS v3             |
-| Validation  | Zod (API input schemas)     |
-| Database    | SQLite via Prisma ORM       |
+### Bill Analysis Engine
+- **Multi-step wizard**: ZIP code → Categories → Bill details → Discounts → Results
+- **Real-time validation**: Ensures Chicago Loop ZIP codes (60601-60607, 60611, 60616, 60661)
+- **Smart recommendations**: Compares current bills against available plans and calculates potential savings
+- **Discount eligibility**: Military, senior, student, and first responder discounts factored into recommendations
 
-**One project. No separate backend process. No Docker. No MongoDB setup.**
+### Chicago Loop Savings Ideas
+- **Curated local spots**: 20+ restaurants, cafes, and attractions with real pricing and recommendations
+- **Category filtering**: Filter by cafes, restaurants, attractions, or walking activities
+- **Dynamic price tiers**: Suggestions adapt based on your calculated savings ($50, $100, $150, $200 tiers)
+- **Actionable details**: Google Maps links, menu links, and specific item recommendations for each spot
+
+### User Experience
+- **Skeleton loading**: Professional loading states that match the final layout
+- **Progress tracking**: Real-time progress bar in header
+- **Mobile responsive**: Optimized for all device sizes
+- **Clean animations**: Smooth transitions and fade-in effects
+
+---
+
+## Tech Stack
+
+| Layer       | Technology                   | Purpose                          |
+|-------------|------------------------------|----------------------------------|
+| Framework   | Next.js 14 (App Router)     | React framework with API routes  |
+| Language    | TypeScript                   | Type safety and better DX       |
+| Styling     | Tailwind CSS v3              | Utility-first CSS framework     |
+| Database    | SQLite via Prisma ORM       | Local database for submissions  |
+| Validation  | Zod                          | Runtime input validation         |
+
+**Single codebase approach**: Frontend and API in one Next.js project, no separate backend needed.
 
 ---
 
 ## Quick Start
 
 ```bash
-# 1. Install
+# 1. Clone the repository
+git clone https://github.com/aryan-code30/Windy_Wallet.git
+cd windywallet
+
+# 2. Install dependencies
 npm install
 
-# 2. Create the database (one-time — creates prisma/windywallet.db)
+# 3. Initialize database (creates prisma/windywallet.db)
 npm run db:push
 
-# 3. Run
+# 4. Start development server
 npm run dev
-# → http://localhost:3000
+# → Open http://localhost:3000
 ```
 
-### Optional: Browse the database
+### Additional Commands
+
 ```bash
+# Build for production
+npm run build
+
+# Run production build
+npm run start
+
+# Browse database
 npm run db:studio
-# → http://localhost:5555
+# → Opens database viewer at http://localhost:5555
 ```
 
 ---
@@ -73,46 +78,95 @@ npm run db:studio
 ## Project Structure
 
 ```
-windywallet-v3/
+windywallet/
+├── .next/                         ← Next.js build output
+├── .git/                          ← Git repository data
 ├── prisma/
-│   └── schema.prisma              ← SQLite schema (Submission model)
+│   ├── schema.prisma              ← Database schema (Submission model)
+│   └── windywallet.db             ← SQLite database file
 ├── src/
 │   ├── app/
-│   │   ├── page.tsx               ← Wizard controller (4-step state machine)
-│   │   ├── layout.tsx             ← Root layout + Google Fonts
-│   │   ├── globals.css            ← Tailwind directives + custom keyframes
+│   │   ├── page.tsx               ← Main wizard component (4-step flow)
+│   │   ├── layout.tsx             ← Root layout with fonts and metadata
+│   │   ├── globals.css            ← Tailwind directives + animations
 │   │   └── api/
-│   │       ├── analyze/route.ts   ← POST /api/analyze (Zod-validated)
-│   │       └── submissions/route.ts ← POST/GET /api/submissions
+│   │       ├── analyze/route.ts   ← POST /api/analyze - main analysis endpoint
+│   │       └── submissions/route.ts ← Submission tracking (GET/POST)
+│   ├── components/
+│   │   ├── Header.tsx             ← Progress bar and navigation
+│   │   ├── ui.tsx                 ← Reusable UI components (buttons, skeletons, etc.)
+│   │   ├── StepWelcome.tsx        ← ZIP code and budget input
+│   │   ├── StepCategories.tsx     ← Bill category selection
+│   │   ├── StepBills.tsx          ← Detailed bill information forms
+│   │   ├── StepDiscounts.tsx      ← Discount eligibility selection
+│   │   └── StepResults.tsx        ← Analysis results + Chicago Loop savings ideas
 │   ├── lib/
-│   │   ├── plans.ts               ← All curated plan data (typed, annotated)
-│   │   ├── engine.ts              ← Recommendation engine (pure TypeScript)
-│   │   └── prisma.ts              ← Prisma client singleton
-│   ├── types/
-│   │   └── index.ts               ← Shared TypeScript interfaces
-│   └── components/
-│       ├── Header.tsx             ← Sticky header with real progress bar
-│       ├── ui.tsx                 ← All shared UI primitives
-│       ├── StepWelcome.tsx        ← ZIP + budget entry
-│       ├── StepCategories.tsx     ← Bill category selection
-│       ├── StepBills.tsx          ← Detailed bill inputs
-│       ├── StepDiscounts.tsx      ← Eligibility + attestation
-│       └── StepResults.tsx        ← Results with skeleton loader + print
+│   │   ├── plans.ts               ← Plan data and pricing information
+│   │   ├── engine.ts              ← Bill analysis and recommendation logic
+│   │   └── prisma.ts              ← Prisma client configuration
+│   └── types/
+│       └── index.ts               ← TypeScript type definitions
+├── node_modules/                  ← Dependencies (gitignored)
+├── package.json                   ← Project configuration and scripts
+├── tailwind.config.ts             ← Tailwind CSS configuration
+├── tsconfig.json                  ← TypeScript configuration
+├── next.config.js                 ← Next.js configuration
+├── postcss.config.js              ← PostCSS configuration
+└── .gitignore                     ← Git ignore rules
 ```
 
 ---
 
-## API
+## How It Works
+
+### 1. User Journey
+1. **Welcome Step**: Enter Chicago Loop ZIP code and monthly budget
+2. **Categories Step**: Select which types of bills to analyze (mobile, internet, transit, etc.)
+3. **Bills Step**: Provide detailed information about current bills
+4. **Discounts Step**: Select applicable discounts (military, senior, student, first responder)
+5. **Results Step**: View analysis results and Chicago Loop savings ideas
+
+### 2. Analysis Engine
+The app compares your current bills against available plans and calculates potential savings:
+- Validates eligibility requirements
+- Applies discount multipliers
+- Calculates monthly and annual savings
+- Provides reasoning for each recommendation
+
+### 3. Savings Ideas Feature
+Based on your calculated savings, the app suggests local Chicago Loop spots:
+- **Dynamic pricing tiers**: Recommendations scale with your potential savings
+- **Category filtering**: Filter by cafes, restaurants, attractions, or walking activities
+- **Actionable information**: Direct links to maps, menus, and specific recommendations
+
+---
+
+## API Reference
 
 ### `POST /api/analyze`
 
+Analyzes bills and returns savings recommendations.
+
+**Request Body:**
 ```json
 {
   "zip": "60601",
   "categories": ["mobile", "transit"],
   "bills": {
-    "mobile": { "provider": "AT&T", "cost": 95, "data": "unlimited", "lines": 1, "hotspot": true, "intl": false },
-    "transit": { "mode": "rideshare", "cost": 220, "freq": 10, "commute": "loop-only" }
+    "mobile": { 
+      "provider": "AT&T", 
+      "cost": 95, 
+      "data": "unlimited", 
+      "lines": 1, 
+      "hotspot": true, 
+      "intl": false 
+    },
+    "transit": { 
+      "mode": "rideshare", 
+      "cost": 220, 
+      "freq": 10, 
+      "commute": "loop-only" 
+    }
   },
   "discounts": ["senior"],
   "childCount": 0,
@@ -120,33 +174,124 @@ windywallet-v3/
 }
 ```
 
-**Response includes:**
-- `totalMonthlySavings`, `totalAnnualSavings`
-- `budgetImpactPct` — what % of monthly budget is recovered
-- `discountMultiplier` — combined % discount applied
-- Per-result: `saving`, `annualSaving`, `savingReasons[]`, `optimalReason`, `warning`, `dataFreshness`
+**Response:**
+```json
+{
+  "totalMonthlySavings": 45,
+  "totalAnnualSavings": 540,
+  "budgetImpactPct": 1.125,
+  "discountMultiplier": 0.9,
+  "results": {
+    "mobile": {
+      "saving": 25,
+      "annualSaving": 300,
+      "savingReasons": ["Switched to Mint Mobile unlimited"],
+      "newCost": 70,
+      "dataFreshness": "2024-03-01"
+    }
+  }
+}
+```
+
+### `POST /api/submissions`
+
+Saves user submission for analytics.
+
+### `GET /api/submissions`
+
+Retrieves submission history (development use).
 
 ---
 
-## Deploy
+## Chicago Loop Coverage
 
-```bash
-# Vercel (recommended)
-npx vercel
+**Valid ZIP Codes:** `60601`, `60602`, `60603`, `60604`, `60605`, `60606`, `60607`, `60611`, `60616`, `60661`
 
-# For production: switch Prisma to PostgreSQL
-# Update prisma/schema.prisma datasource provider to "postgresql"
-# Set DATABASE_URL env var to your Postgres connection string
+**Savings Ideas Include:**
+- **Cafes**: Stan's Donuts, Intelligentsia, Blue Bottle Coffee
+- **Restaurants**: Girl & the Goat, Alinea, The Purple Pig, Mr. Submarine, Naansense
+- **Attractions**: Art Institute, Architecture tours, Millennium Park
+- **Walking activities**: Riverwalk, Grant Park, free outdoor events
+
+---
+
+## Development
+
+### Adding New Plans
+1. Edit `src/lib/plans.ts`
+2. Add plan data with required fields: `name`, `cost`, `features`, `notes`, `bestFor`
+3. Update recommendation logic in `src/lib/engine.ts` if needed
+
+### Adding Savings Ideas
+1. Edit the `savingsIdeas` array in `src/components/StepResults.tsx`
+2. Include: `name`, `description`, `tier`, `map`, `menu` (optional), `recommended`, `category`
+3. Choose appropriate category: `cafes`, `restaurants`, `attractions`, `walking`
+
+### Database Schema
+The app uses a simple Submission model to track user interactions:
+```prisma
+model Submission {
+  id        Int      @id @default(autoincrement())
+  zip       String
+  categories String
+  createdAt DateTime @default(now())
+}
 ```
 
 ---
 
-## Valid Chicago Loop ZIP Codes
-`60601` `60602` `60603` `60604` `60605` `60606` `60607` `60611` `60616` `60661`
+## Deployment
+
+### Vercel (Recommended)
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Deploy
+npx vercel
+
+# Follow prompts to link your GitHub repository
+```
+
+### Other Platforms
+For production deployment on other platforms:
+1. **Database**: Consider switching from SQLite to PostgreSQL for production
+   - Update `prisma/schema.prisma` provider to `"postgresql"`
+   - Set `DATABASE_URL` environment variable
+2. **Environment**: Ensure all environment variables are set
+3. **Build**: Run `npm run build` to create production build
 
 ---
 
-## Disclaimer
-WindyWallet shows estimates based on publicly available pricing as of January 2026.
-Always verify pricing directly with providers before switching.
-Not affiliated with any carrier, CTA, Metra, or insurer.
+## Contributing
+
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
+3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
+4. **Push** to the branch (`git push origin feature/amazing-feature`)
+5. **Open** a Pull Request
+
+### Development Guidelines
+- Follow TypeScript best practices
+- Use Tailwind CSS for styling
+- Add appropriate loading states and error handling
+- Test on mobile devices
+- Update README if adding major features
+
+---
+
+## License & Disclaimer
+
+This project is open source and available under the [MIT License](LICENSE).
+
+**Disclaimer**: WindyWallet provides estimates based on publicly available information as of March 2026. Always verify current pricing and terms directly with service providers before making any changes. This application is not affiliated with any carrier, transit authority, or service provider mentioned.
+
+**Privacy**: User data is stored locally in SQLite for development. No personal information is transmitted to external services beyond what's necessary for the application to function.
+
+---
+
+## Repository
+
+**GitHub**: [aryan-code30/Windy_Wallet](https://github.com/aryan-code30/Windy_Wallet)
+
+Built with ❤️ for Chicago Loop residents and workers.
