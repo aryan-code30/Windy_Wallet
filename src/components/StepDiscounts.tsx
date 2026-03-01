@@ -43,6 +43,12 @@ const DISCOUNTS: {
     pct: 4,
     programs: "Multi-line family discounts, Comcast Internet Essentials (K-12 students), school connectivity programs",
   },
+  {
+    id: "none", emoji: "🚫", label: "None of the Above",
+    sub: "I don't qualify for any of the listed discount groups",
+    pct: 0,
+    programs: "",
+  },
 ];
 
 export default function StepDiscounts({ form, patch, onBack, onSubmit }: {
@@ -54,8 +60,16 @@ export default function StepDiscounts({ form, patch, onBack, onSubmit }: {
   const [expanded, setExpanded] = useState<DiscountType | null>(null);
 
   const toggle = (id: DiscountType) => {
-    const next = form.discounts.includes(id) ? [] : [id];
-    patch("discounts", next);
+    if (id === "none") {
+      // Selecting "none" clears all other selections
+      const next = form.discounts.includes("none") ? [] : ["none" as DiscountType];
+      patch("discounts", next);
+    } else {
+      // Selecting any real discount clears "none"
+      const without = form.discounts.filter(d => d !== "none");
+      const next = without.includes(id) ? without.filter(d => d !== id) : [...without, id];
+      patch("discounts", next);
+    }
   };
 
   const submit = () => {
@@ -63,9 +77,9 @@ export default function StepDiscounts({ form, patch, onBack, onSubmit }: {
     setErr(""); onSubmit();
   };
 
-  // Estimate combined discount
+  // Estimate combined discount — exclude "none"
   const totalDiscPct = DISCOUNTS
-    .filter(d => form.discounts.includes(d.id))
+    .filter(d => d.id !== "none" && form.discounts.includes(d.id))
     .reduce((s, d) => s + d.pct + (d.id === "child" ? (form.childCount - 1) * d.pct : 0), 0);
   const cappedPct = Math.min(totalDiscPct, 40);
 
@@ -78,11 +92,11 @@ export default function StepDiscounts({ form, patch, onBack, onSubmit }: {
       </Subtitle>
 
       {/* Live discount preview */}
-      {form.discounts.length > 0 && (
+      {form.discounts.filter(d => d !== "none").length > 0 && (
         <div className="bg-emerald-50 border border-emerald-100 rounded-2xl px-5 py-4 mb-5 flex items-center justify-between">
           <div>
             <p className="text-sm font-bold text-emerald-800">
-              {form.discounts.length} discount{form.discounts.length > 1 ? "s" : ""} selected
+              {form.discounts.filter(d => d !== "none").length} discount{form.discounts.filter(d => d !== "none").length > 1 ? "s" : ""} selected
             </p>
             <p className="text-xs text-emerald-600 mt-0.5">
               Up to {cappedPct}% additional savings applied to eligible plans
@@ -107,7 +121,7 @@ export default function StepDiscounts({ form, patch, onBack, onSubmit }: {
                 badge={`~${d.pct}% off eligible plans`}
               />
               {/* Expanded program details */}
-              {form.discounts.includes(d.id) && (
+              {form.discounts.includes(d.id) && d.id !== "none" && (
                 <div className="mt-1.5 ml-1 bg-blue-50 border border-blue-100 rounded-xl px-3.5 py-3">
                   <p className="text-[11px] font-bold text-primary uppercase tracking-wide mb-1">Applicable programs</p>
                   <p className="text-xs text-blue-700 leading-relaxed">{d.programs}</p>

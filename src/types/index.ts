@@ -1,5 +1,5 @@
 export type Category = "mobile" | "internet" | "transit" | "insurance";
-export type DiscountType = "veteran"|"disability"|"senior"|"frontline"|"lowincome"|"child";
+export type DiscountType = "veteran"|"disability"|"senior"|"frontline"|"lowincome"|"child"|"none";
 export type CoverageLevel = "basic"|"standard"|"premium";
 export type DatacapOption = "yes"|"no";
 export type CommuteType = "loop-only"|"suburb-loop"|"mixed";
