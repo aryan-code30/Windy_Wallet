@@ -79,3 +79,28 @@ export async function GET(req: NextRequest) {
   }
 }
 
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const id    = searchParams.get("id");
+    const year  = searchParams.get("year")  ? parseInt(searchParams.get("year")!)  : undefined;
+    const month = searchParams.get("month") ? parseInt(searchParams.get("month")!) : undefined;
+
+    // Delete a single entry by id
+    if (id) {
+      await prisma.submission.delete({ where: { id } });
+      return NextResponse.json({ success: true, deleted: "entry", id });
+    }
+
+    // Delete all entries for a whole month
+    if (year && month) {
+      const { count } = await prisma.submission.deleteMany({ where: { year, month } });
+      return NextResponse.json({ success: true, deleted: "month", count });
+    }
+
+    return NextResponse.json({ error: "Provide ?id= or ?year=&month=" }, { status: 400 });
+  } catch {
+    return NextResponse.json({ success: false }, { status: 500 });
+  }
+}
+
