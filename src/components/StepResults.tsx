@@ -2,6 +2,11 @@
 import { useState } from "react";
 import { Eyebrow, PageTitle, Grad, Notice, Skeleton, BtnRow, Btn } from "./ui";
 import MonthlyHistory from "./MonthlyHistory";
+import SavingsChart from "./SavingsChart";
+import SeasonalPlanner from "./SeasonalPlanner";
+import BillTracker from "./BillTracker";
+import GroceryMap from "./GroceryMap";
+import TransitPlanner from "./TransitPlanner";
 import type { AnalyzeResponse, ComparisonResult, FormState, DiscountType } from "@/types";
 
 const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -978,6 +983,51 @@ export default function StepResults({ result, loading, error, form, onBack, onRe
 
       {/* ── Monthly History ── */}
       <MonthlyHistory />
+
+      {/* ── Loop Life Tools ── */}
+      {(() => {
+        const TOOLS = [
+          { id: "chart",    label: "📊 History",   title: "Savings History Chart"  },
+          { id: "transit",  label: "🚇 Transit",   title: "Transit Planner"        },
+          { id: "grocery",  label: "🛒 Grocery",   title: "Grocery Map"            },
+          { id: "seasonal", label: "🌦️ Seasonal",  title: "Seasonal Budget"        },
+          { id: "tracker",  label: "🔔 Bills",     title: "Bill Due Date Tracker"  },
+        ] as const;
+        type ToolId = typeof TOOLS[number]["id"];
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const [activeTool, setActiveTool] = useState<ToolId>("chart");
+        return (
+          <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+            {/* Tab bar */}
+            <div className="border-b border-gray-100 px-4 pt-4">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">🏙️ Loop Life Tools</p>
+              <div className="flex gap-1 overflow-x-auto pb-0 scrollbar-hide">
+                {TOOLS.map(t => (
+                  <button
+                    key={t.id}
+                    onClick={() => setActiveTool(t.id)}
+                    className={`flex-shrink-0 text-[11px] font-semibold px-3 py-1.5 rounded-t-lg border-b-2 transition-colors whitespace-nowrap ${
+                      activeTool === t.id
+                        ? "border-indigo-600 text-indigo-700 bg-indigo-50"
+                        : "border-transparent text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {/* Tool panel */}
+            <div className="p-5">
+              {activeTool === "chart"    && <SavingsChart />}
+              {activeTool === "transit"  && <TransitPlanner />}
+              {activeTool === "grocery"  && <GroceryMap />}
+              {activeTool === "seasonal" && <SeasonalPlanner />}
+              {activeTool === "tracker"  && <BillTracker />}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* ── Action bar ── */}
       <div className="flex flex-wrap items-center justify-between gap-3 mt-8 pt-6 border-t border-gray-100">
