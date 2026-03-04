@@ -25,6 +25,20 @@ export default function StepBills({ form, patchBill, patchInsurance, onBack, onN
 
   const num = (v: string) => v === "" ? 0 : parseFloat(v);
 
+  // ── Demo fill ────────────────────────────────────────
+  const fillDemo = () => {
+    if (cats.includes("mobile"))   { patchBill("mobile","provider","AT&T"); patchBill("mobile","cost",95); patchBill("mobile","data","unlimited"); patchBill("mobile","lines",1); }
+    if (cats.includes("internet")) { patchBill("internet","provider","Comcast Xfinity"); patchBill("internet","cost",85); patchBill("internet","speed",300); patchBill("internet","datacap","no"); }
+    if (cats.includes("transit"))  { patchBill("transit","mode","rideshare"); patchBill("transit","cost",220); patchBill("transit","freq",10); patchBill("transit","commute","loop-only"); }
+    if (cats.includes("insurance")) {
+      patchInsurance([
+        { insType: "renters", cost: 28, deductible: 500,  coverage: "standard" },
+        { insType: "auto",    cost: 135, deductible: 1000, coverage: "standard" },
+      ]);
+    }
+    setErr("");
+  };
+
   // ── insurance helpers ────────────────────────────────
   const policies = b.insurance.policies;
   const activeTypes = new Set(policies.map(p => p.insType));
@@ -60,6 +74,21 @@ export default function StepBills({ form, patchBill, patchInsurance, onBack, onN
       <Eyebrow>Step 2 of 4 — Your Bills</Eyebrow>
       <PageTitle>Current <Grad>bill details</Grad></PageTitle>
       <Subtitle>Enter exactly what you pay today. The more accurate this is, the more precise your savings estimate will be.</Subtitle>
+
+      {/* Demo fill banner */}
+      <div className="flex items-center justify-between bg-amber-50 border border-amber-200 rounded-2xl px-5 py-3 mb-5">
+        <div>
+          <p className="text-[12px] font-bold text-amber-800">⚡ Demo Mode</p>
+          <p className="text-[11px] text-amber-600">Fill with realistic Loop resident data instantly</p>
+        </div>
+        <button
+          type="button"
+          onClick={fillDemo}
+          className="flex-shrink-0 px-4 py-2 rounded-full bg-amber-500 text-white text-[12px] font-bold hover:bg-amber-600 transition-colors"
+        >
+          Auto-fill
+        </button>
+      </div>
 
       {/* ── MOBILE ─────────────────────────────────────── */}
       {cats.includes("mobile") && (

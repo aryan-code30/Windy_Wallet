@@ -7,6 +7,8 @@ import SeasonalPlanner from "./SeasonalPlanner";
 import BillTracker from "./BillTracker";
 import GroceryMap from "./GroceryMap";
 import TransitPlanner from "./TransitPlanner";
+import ScoreCard from "./ScoreCard";
+import CountUp from "./CountUp";
 import type { AnalyzeResponse, ComparisonResult, FormState, DiscountType } from "@/types";
 
 const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -738,10 +740,10 @@ export default function StepResults({ result, loading, error, form, onBack, onRe
             <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1">Estimated Monthly Savings</p>
             <p className="font-display leading-none font-extrabold tracking-tight mb-1 animate-fade-up"
               style={{ fontSize: "clamp(44px,7vw,64px)" }}>
-              ${totalMonthlySavings.toFixed(2)}
+              <CountUp value={totalMonthlySavings} prefix="$" decimals={2} />
             </p>
             <p className="text-sm opacity-70 mb-4">
-              ${totalAnnualSavings.toFixed(0)}/yr
+              <CountUp value={totalAnnualSavings} prefix="$" decimals={0} />/yr
               {budgetImpactPct ? ` · ${budgetImpactPct}% of budget recovered` : ""}
             </p>
             <div className="flex flex-wrap gap-1.5">
@@ -899,6 +901,9 @@ export default function StepResults({ result, loading, error, form, onBack, onRe
           </div>
         ))}
       </div>
+
+      {/* ── Loop Life Score Card ── */}
+      <ScoreCard result={result} form={form} />
 
       {/* ── Discounts applied notice ── */}
       {discountMultiplier > 0 && discLabels.length > 0 && (

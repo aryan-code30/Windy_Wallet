@@ -6,6 +6,12 @@ import type { FormState } from "@/types";
 
 const ALL_ZIPS = ["60601","60602","60603","60604","60605","60606","60607","60611","60616","60661"];
 
+const DEMO_FILL: Partial<FormState> = {
+  zip: "60601",
+  address: "233 S Wacker Dr (Willis Tower)",
+  budget: { total: "3200", utilities: "180", personal: "600", other: "300" },
+};
+
 export default function StepWelcome({ form, patch, onNext }: {
   form: FormState;
   patch: <K extends keyof FormState>(key: K, val: FormState[K]) => void;
@@ -16,6 +22,13 @@ export default function StepWelcome({ form, patch, onNext }: {
   const zipStatus = form.zip.length === 5
     ? LOOP_ZIPS.has(form.zip) ? "ok" : "bad"
     : null;
+
+  const fillDemo = () => {
+    (Object.keys(DEMO_FILL) as (keyof FormState)[]).forEach(k => {
+      patch(k, DEMO_FILL[k] as FormState[typeof k]);
+    });
+    setErr("");
+  };
 
   const next = () => {
     if (!LOOP_ZIPS.has(form.zip)) { setErr("Please enter a valid Chicago Loop ZIP code."); return; }
@@ -41,6 +54,14 @@ export default function StepWelcome({ form, patch, onNext }: {
               <span key={t} className="bg-white/80 rounded-full px-4 py-1.5 text-xs font-semibold text-gray-600 shadow-sm">{t}</span>
             ))}
           </div>
+          {/* Demo fill button */}
+          <button
+            type="button"
+            onClick={fillDemo}
+            className="mt-5 inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/80 border border-blue-200 text-xs font-bold text-blue-600 hover:bg-blue-50 transition-all shadow-sm"
+          >
+            ⚡ Auto-fill Demo Data
+          </button>
         </div>
       </div>
 
@@ -49,7 +70,7 @@ export default function StepWelcome({ form, patch, onNext }: {
         {[
           ["~$280", "Avg annual savings", "text-primary"],
           ["10",    "Loop ZIP codes",      "text-accent"],
-          ["Jan 2026", "Data verified",   "text-emerald-600"],
+          ["Mar 2026", "Data verified",   "text-emerald-600"],
         ].map(([v, l, cls]) => (
           <div key={l} className="bg-white border border-gray-100 rounded-2xl p-4 text-center shadow-sm">
             <div className={`font-display text-2xl font-extrabold tracking-tight ${cls} mb-1`}>{v}</div>

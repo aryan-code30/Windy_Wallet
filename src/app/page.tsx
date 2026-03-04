@@ -6,6 +6,8 @@ import StepCategories from "@/components/StepCategories";
 import StepBills from "@/components/StepBills";
 import StepDiscounts from "@/components/StepDiscounts";
 import StepResults from "@/components/StepResults";
+import SplashScreen from "@/components/SplashScreen";
+import Confetti from "@/components/Confetti";
 import type { FormState, AnalyzeResponse } from "@/types";
 
 const now = new Date();
@@ -25,6 +27,8 @@ const INITIAL: FormState = {
 };
 
 export default function Page() {
+  const [showSplash, setShowSplash] = useState(true);
+  const [confetti, setConfetti]     = useState(false);
   const [step, setStep]       = useState(0);
   const [form, setForm]       = useState<FormState>(INITIAL);
   const [result, setResult]   = useState<AnalyzeResponse | null>(null);
@@ -77,6 +81,7 @@ export default function Page() {
       }
       if (!data) throw new Error("Analysis failed: server returned an unexpected response.");
       setResult(data as AnalyzeResponse);
+      setConfetti(true);
       // persist to DB silently
       fetch("/api/submissions", {
         method: "POST",
@@ -100,7 +105,7 @@ export default function Page() {
     }
   };
 
-  const reset = () => { setForm(INITIAL); setResult(null); setApiErr(""); goTo(0); };
+  const reset = () => { setForm(INITIAL); setResult(null); setApiErr(""); setConfetti(false); goTo(0); };
 
   const pages = [
     <StepWelcome    key={0} form={form} patch={patch} onNext={() => goTo(1)} />,
@@ -112,6 +117,8 @@ export default function Page() {
 
   return (
     <div className="min-h-screen bg-white">
+      {showSplash && <SplashScreen onEnter={() => setShowSplash(false)} />}
+      <Confetti trigger={confetti} />
       <Header step={step} totalSteps={5} />
       <main className="max-w-3xl mx-auto px-5 py-10 pb-24">
         {pages[step]}

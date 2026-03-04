@@ -1,6 +1,9 @@
 "use client";
 
 const STEP_LABELS = ["Location", "Categories", "Bills", "Discounts", "Results"];
+const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const now = new Date();
+const CURRENT_LABEL = `${MONTH_NAMES[now.getMonth()]} ${now.getFullYear()}`;
 
 export default function Header({ step, totalSteps }: { step: number; totalSteps: number }) {
   const pct = Math.round((step / (totalSteps - 1)) * 100);
@@ -21,7 +24,7 @@ export default function Header({ step, totalSteps }: { step: number; totalSteps:
                 Wallet
               </span>
             </div>
-            <div className="text-[9px] text-gray-400 tracking-widest mt-0.5 uppercase">Chicago Loop · Jan 2026</div>
+            <div className="text-[9px] text-gray-400 tracking-widest mt-0.5 uppercase">Chicago Loop · {CURRENT_LABEL}</div>
           </div>
         </div>
 
