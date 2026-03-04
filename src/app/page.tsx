@@ -6,7 +6,6 @@ import StepCategories from "@/components/StepCategories";
 import StepBills from "@/components/StepBills";
 import StepDiscounts from "@/components/StepDiscounts";
 import StepResults from "@/components/StepResults";
-import SplashScreen from "@/components/SplashScreen";
 import Confetti from "@/components/Confetti";
 import DesktopSidebar from "@/components/DesktopSidebar";
 import { useViewMode } from "@/components/ViewModeContext";
@@ -30,7 +29,6 @@ const INITIAL: FormState = {
 
 export default function Page() {
   const { mode } = useViewMode();
-  const [showSplash, setShowSplash] = useState(true);
   const [confetti, setConfetti]     = useState(false);
   const [step, setStep]       = useState(0);
   const [form, setForm]       = useState<FormState>(INITIAL);
@@ -120,7 +118,6 @@ export default function Page() {
 
   return (
     <div className="min-h-screen bg-white">
-      {showSplash && <SplashScreen onEnter={() => setShowSplash(false)} />}
       <Confetti trigger={confetti} />
       <Header step={step} totalSteps={5} />
 
