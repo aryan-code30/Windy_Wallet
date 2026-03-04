@@ -8,6 +8,8 @@ import StepDiscounts from "@/components/StepDiscounts";
 import StepResults from "@/components/StepResults";
 import SplashScreen from "@/components/SplashScreen";
 import Confetti from "@/components/Confetti";
+import DesktopSidebar from "@/components/DesktopSidebar";
+import { useViewMode } from "@/components/ViewModeContext";
 import type { FormState, AnalyzeResponse } from "@/types";
 
 const now = new Date();
@@ -27,6 +29,7 @@ const INITIAL: FormState = {
 };
 
 export default function Page() {
+  const { mode } = useViewMode();
   const [showSplash, setShowSplash] = useState(true);
   const [confetti, setConfetti]     = useState(false);
   const [step, setStep]       = useState(0);
@@ -120,9 +123,30 @@ export default function Page() {
       {showSplash && <SplashScreen onEnter={() => setShowSplash(false)} />}
       <Confetti trigger={confetti} />
       <Header step={step} totalSteps={5} />
-      <main className="max-w-3xl mx-auto px-5 py-10 pb-24">
-        {pages[step]}
-      </main>
+
+      {mode === "desktop" ? (
+        /* ── Desktop: sidebar + content ── */
+        <div className="max-w-screen-xl mx-auto px-5 py-8 pb-24 flex gap-6 items-start">
+          <DesktopSidebar
+            step={step}
+            form={form}
+            result={result}
+            onStepClick={(n) => {
+              // Only allow going back or to results if we have a result
+              if (n < step || (n === 4 && result)) goTo(n);
+            }}
+          />
+          {/* Main content — fills remaining space, max ~860px */}
+          <main className="flex-1 min-w-0 max-w-[860px]">
+            {pages[step]}
+          </main>
+        </div>
+      ) : (
+        /* ── Mobile: single column, centered ── */
+        <main className="max-w-3xl mx-auto px-5 py-10 pb-24">
+          {pages[step]}
+        </main>
+      )}
     </div>
   );
 }
