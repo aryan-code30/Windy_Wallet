@@ -1,8 +1,8 @@
 # 🌬 WindyWallet
 
-Chicago Loop bill optimizer built with Next.js.
+WindyWallet is a Chicago Loop-focused bill optimization app built with Next.js that helps residents quickly understand where they’re overpaying on everyday services.
 
-Enter your monthly bills, apply eligible discounts, and get clear monthly + annual savings recommendations.
+It analyzes your mobile, internet, transit, and insurance costs, compares them against better-value plan options for Loop ZIP codes, applies eligible discount programs, and shows clear monthly + annual savings with practical budgeting tools.
 
 ## Highlights
 
