@@ -1,4 +1,4 @@
-# 🌬 WindyWallet v3
+# 🌬 WindyWallet
 ### Chicago Loop Bill Optimizer — Theme: Loop Life
 
 > A full-stack Next.js app that analyzes your monthly bills, finds real savings, applies Chicago-specific discount programs, and gives you a suite of Loop Life tools — all in one multi-step wizard.
