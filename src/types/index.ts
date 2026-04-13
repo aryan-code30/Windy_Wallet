@@ -99,3 +99,20 @@ export interface MonthlyRecord {
   billsSnapshot: Record<string, any>;
   createdAt: string;
 }
+
+export type EventCostType = "free" | "low-cost";
+export type EventCategory = "music" | "fitness" | "market" | "museum" | "community";
+
+export interface ChicagoEvent {
+  id: string;
+  title: string;
+  description: string;
+  category: EventCategory;
+  costType: EventCostType;
+  costLabel: string;
+  neighborhood: string;
+  location: string;
+  startAt: string; // ISO datetime
+  endAt?: string;  // ISO datetime
+  link: string;
+}

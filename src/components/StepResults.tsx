@@ -7,6 +7,7 @@ import SeasonalPlanner from "./SeasonalPlanner";
 import BillTracker from "./BillTracker";
 import GroceryMap from "./GroceryMap";
 import TransitPlanner from "./TransitPlanner";
+import EventsCalendar from "./EventsCalendar";
 import ScoreCard from "./ScoreCard";
 import CountUp from "./CountUp";
 import type { AnalyzeResponse, ComparisonResult, FormState, DiscountType } from "@/types";
@@ -488,6 +489,7 @@ const LOOP_TOOLS = [
   { id: "chart",    label: "📊 History"  },
   { id: "transit",  label: "🚇 Transit"  },
   { id: "grocery",  label: "🛒 Grocery"  },
+  { id: "events",   label: "🎉 Events"   },
   { id: "seasonal", label: "🌦️ Seasonal" },
   { id: "tracker",  label: "🔔 Bills"    },
 ] as const;
@@ -521,6 +523,7 @@ function LoopLifeTools() {
         {activeTool === "chart"    && <SavingsChart />}
         {activeTool === "transit"  && <TransitPlanner />}
         {activeTool === "grocery"  && <GroceryMap />}
+        {activeTool === "events"   && <EventsCalendar />}
         {activeTool === "seasonal" && <SeasonalPlanner />}
         {activeTool === "tracker"  && <BillTracker />}
       </div>
