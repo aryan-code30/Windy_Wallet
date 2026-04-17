@@ -7,9 +7,26 @@ function dateAtOffset(daysFromNow: number, hour: number, minute = 0) {
   return d.toISOString();
 }
 
-const EVENTS: ChicagoEvent[] = [
+interface EventTemplate {
+  seriesId: string;
+  title: string;
+  description: string;
+  category: ChicagoEvent["category"];
+  costType: ChicagoEvent["costType"];
+  costLabel: string;
+  neighborhood: string;
+  location: string;
+  link: string;
+  startOffsetDays: number;
+  startHour: number;
+  startMinute?: number;
+  durationMins: number;
+  recurrence?: ChicagoEvent["recurrence"];
+}
+
+const TEMPLATES: EventTemplate[] = [
   {
-    id: "millennium-concert",
+    seriesId: "millennium-concert",
     title: "Millennium Park Summer Music Series",
     description: "Outdoor evening concert at Pritzker Pavilion.",
     category: "music",
@@ -17,12 +34,15 @@ const EVENTS: ChicagoEvent[] = [
     costLabel: "Free",
     neighborhood: "The Loop",
     location: "Jay Pritzker Pavilion, Millennium Park",
-    startAt: dateAtOffset(2, 18, 30),
-    endAt: dateAtOffset(2, 20, 30),
+    startOffsetDays: 2,
+    startHour: 18,
+    startMinute: 30,
+    durationMins: 120,
+    recurrence: "weekly",
     link: "https://www.chicago.gov/city/en/depts/dca/supp_info/millennium_park9.html",
   },
   {
-    id: "lakefront-fun-run",
+    seriesId: "lakefront-fun-run",
     title: "Lakefront Sunset Fun Run",
     description: "Community 5K run/walk with meet-up pace groups.",
     category: "fitness",
@@ -30,12 +50,14 @@ const EVENTS: ChicagoEvent[] = [
     costLabel: "Free",
     neighborhood: "Near Loop",
     location: "Lakefront Trail (Monroe Harbor start)",
-    startAt: dateAtOffset(3, 18, 0),
-    endAt: dateAtOffset(3, 19, 15),
+    startOffsetDays: 3,
+    startHour: 18,
+    durationMins: 75,
+    recurrence: "weekly",
     link: "https://www.chicagoparkdistrict.com/parks-facilities/lakefront-trail",
   },
   {
-    id: "daley-plaza-market",
+    seriesId: "daley-plaza-market",
     title: "Daley Plaza Farmers Market",
     description: "Fresh produce, breads, and local vendors in the Loop.",
     category: "market",
@@ -43,12 +65,14 @@ const EVENTS: ChicagoEvent[] = [
     costLabel: "Free entry",
     neighborhood: "The Loop",
     location: "Daley Plaza",
-    startAt: dateAtOffset(4, 8, 0),
-    endAt: dateAtOffset(4, 14, 0),
+    startOffsetDays: 4,
+    startHour: 8,
+    durationMins: 360,
+    recurrence: "weekly",
     link: "https://www.chicago.gov/city/en/depts/dca/supp_info/farmers_markets.html",
   },
   {
-    id: "museum-campus-free-day",
+    seriesId: "museum-campus-free-day",
     title: "Illinois Resident Museum Free Day",
     description: "Select museums offering free or reduced admission days.",
     category: "museum",
@@ -56,12 +80,14 @@ const EVENTS: ChicagoEvent[] = [
     costLabel: "Free / reduced",
     neighborhood: "Museum Campus",
     location: "Participating Chicago Museums",
-    startAt: dateAtOffset(5, 10, 0),
-    endAt: dateAtOffset(5, 17, 0),
+    startOffsetDays: 5,
+    startHour: 10,
+    durationMins: 420,
+    recurrence: "monthly",
     link: "https://www.choosechicago.com/articles/museums-art/free-museum-days-in-chicago/",
   },
   {
-    id: "riverwalk-yoga",
+    seriesId: "riverwalk-yoga",
     title: "Riverwalk Morning Yoga",
     description: "Beginner-friendly outdoor yoga session by the river.",
     category: "fitness",
@@ -69,12 +95,14 @@ const EVENTS: ChicagoEvent[] = [
     costLabel: "$5 suggested",
     neighborhood: "The Loop",
     location: "Chicago Riverwalk (Franklin St steps)",
-    startAt: dateAtOffset(6, 8, 0),
-    endAt: dateAtOffset(6, 9, 0),
+    startOffsetDays: 6,
+    startHour: 8,
+    durationMins: 60,
+    recurrence: "weekly",
     link: "https://www.chicagoriverwalk.us/",
   },
   {
-    id: "neighborhood-street-fest",
+    seriesId: "neighborhood-street-fest",
     title: "Neighborhood Street Fest",
     description: "Local food vendors, live sets, and family activities.",
     category: "community",
@@ -82,12 +110,13 @@ const EVENTS: ChicagoEvent[] = [
     costLabel: "$10 suggested donation",
     neighborhood: "West Loop",
     location: "Fulton Market District",
-    startAt: dateAtOffset(7, 12, 0),
-    endAt: dateAtOffset(7, 19, 0),
+    startOffsetDays: 7,
+    startHour: 12,
+    durationMins: 420,
     link: "https://www.choosechicago.com/articles/festivals-special-events/chicago-festival-event-guide/",
   },
   {
-    id: "grant-park-movie-night",
+    seriesId: "grant-park-movie-night",
     title: "Grant Park Movie Night",
     description: "Bring-a-blanket outdoor movie screening.",
     category: "community",
@@ -95,12 +124,14 @@ const EVENTS: ChicagoEvent[] = [
     costLabel: "Free",
     neighborhood: "The Loop",
     location: "Grant Park",
-    startAt: dateAtOffset(9, 20, 0),
-    endAt: dateAtOffset(9, 22, 0),
+    startOffsetDays: 9,
+    startHour: 20,
+    durationMins: 120,
+    recurrence: "weekly",
     link: "https://www.chicagoparkdistrict.com/parks-facilities/grant-park",
   },
   {
-    id: "millennium-lunch-concert",
+    seriesId: "millennium-lunch-concert",
     title: "Millennium Park Lunch Concert",
     description: "Midday live music break near work/school.",
     category: "music",
@@ -108,12 +139,15 @@ const EVENTS: ChicagoEvent[] = [
     costLabel: "Free",
     neighborhood: "The Loop",
     location: "Millennium Park",
-    startAt: dateAtOffset(10, 12, 15),
-    endAt: dateAtOffset(10, 13, 0),
+    startOffsetDays: 10,
+    startHour: 12,
+    startMinute: 15,
+    durationMins: 45,
+    recurrence: "weekly",
     link: "https://www.chicago.gov/city/en/depts/dca/supp_info/millennium_park9.html",
   },
   {
-    id: "south-loop-market",
+    seriesId: "south-loop-market",
     title: "South Loop Pop-Up Market",
     description: "Budget-friendly local food + handmade goods.",
     category: "market",
@@ -121,12 +155,14 @@ const EVENTS: ChicagoEvent[] = [
     costLabel: "Free entry",
     neighborhood: "South Loop",
     location: "Printers Row Plaza",
-    startAt: dateAtOffset(11, 11, 0),
-    endAt: dateAtOffset(11, 16, 0),
+    startOffsetDays: 11,
+    startHour: 11,
+    durationMins: 300,
+    recurrence: "weekly",
     link: "https://www.choosechicago.com/articles/neighborhoods/chicago-south-loop-neighborhood-guide/",
   },
   {
-    id: "lakefront-group-run",
+    seriesId: "lakefront-group-run",
     title: "Lakefront Weekend Group Run",
     description: "Casual pace run club with 3K and 8K options.",
     category: "fitness",
@@ -134,12 +170,14 @@ const EVENTS: ChicagoEvent[] = [
     costLabel: "Free",
     neighborhood: "Near Loop",
     location: "Lakefront Trail (Buckingham Fountain meet point)",
-    startAt: dateAtOffset(12, 9, 0),
-    endAt: dateAtOffset(12, 10, 30),
+    startOffsetDays: 12,
+    startHour: 9,
+    durationMins: 90,
+    recurrence: "weekly",
     link: "https://www.chicagoparkdistrict.com/parks-facilities/lakefront-trail",
   },
   {
-    id: "community-art-walk",
+    seriesId: "community-art-walk",
     title: "Community Art Walk",
     description: "Guided walk through Loop murals and public art.",
     category: "community",
@@ -147,12 +185,14 @@ const EVENTS: ChicagoEvent[] = [
     costLabel: "$8",
     neighborhood: "The Loop",
     location: "Chicago Cultural Center (start)",
-    startAt: dateAtOffset(13, 15, 0),
-    endAt: dateAtOffset(13, 16, 30),
+    startOffsetDays: 13,
+    startHour: 15,
+    durationMins: 90,
+    recurrence: "weekly",
     link: "https://www.chicago.gov/city/en/depts/dca/supp_info/chicago_culturalcenter.html",
   },
   {
-    id: "field-museum-discount-day",
+    seriesId: "field-museum-discount-day",
     title: "Field Museum Discount Day",
     description: "Reduced ticket day for Chicago residents.",
     category: "museum",
@@ -160,12 +200,62 @@ const EVENTS: ChicagoEvent[] = [
     costLabel: "$10–$15",
     neighborhood: "Museum Campus",
     location: "Field Museum",
-    startAt: dateAtOffset(14, 10, 0),
-    endAt: dateAtOffset(14, 17, 0),
+    startOffsetDays: 14,
+    startHour: 10,
+    durationMins: 420,
+    recurrence: "monthly",
     link: "https://www.fieldmuseum.org/visit/free-days",
   },
 ];
 
-export const CHICAGO_EVENTS = [...EVENTS].sort(
+function occurrenceId(seriesId: string, startAtIso: string) {
+  return `${seriesId}-${startAtIso.slice(0, 10)}`;
+}
+
+function toEvent(template: EventTemplate, startAtIso: string): ChicagoEvent {
+  const start = new Date(startAtIso);
+  const end = new Date(start.getTime() + template.durationMins * 60 * 1000);
+  return {
+    id: occurrenceId(template.seriesId, startAtIso),
+    seriesId: template.seriesId,
+    title: template.title,
+    description: template.description,
+    category: template.category,
+    costType: template.costType,
+    costLabel: template.costLabel,
+    neighborhood: template.neighborhood,
+    location: template.location,
+    startAt: start.toISOString(),
+    endAt: end.toISOString(),
+    link: template.link,
+    recurrence: template.recurrence ?? "none",
+  };
+}
+
+function expandTemplate(template: EventTemplate): ChicagoEvent[] {
+  const first = dateAtOffset(template.startOffsetDays, template.startHour, template.startMinute ?? 0);
+  const baseStart = new Date(first);
+  const windowEnd = Date.now() + 28 * 24 * 60 * 60 * 1000;
+  const out: ChicagoEvent[] = [];
+
+  let cursor = new Date(baseStart);
+  while (cursor.getTime() <= windowEnd) {
+    out.push(toEvent(template, cursor.toISOString()));
+
+    if (template.recurrence === "weekly") {
+      cursor = new Date(cursor.getTime() + 7 * 24 * 60 * 60 * 1000);
+    } else if (template.recurrence === "monthly") {
+      const next = new Date(cursor);
+      next.setMonth(next.getMonth() + 1);
+      cursor = next;
+    } else {
+      break;
+    }
+  }
+
+  return out;
+}
+
+export const CHICAGO_EVENTS = TEMPLATES.flatMap(expandTemplate).sort(
   (a, b) => new Date(a.startAt).getTime() - new Date(b.startAt).getTime()
 );

@@ -102,9 +102,11 @@ export interface MonthlyRecord {
 
 export type EventCostType = "free" | "low-cost";
 export type EventCategory = "music" | "fitness" | "market" | "museum" | "community";
+export type EventRecurrence = "none" | "weekly" | "monthly";
 
 export interface ChicagoEvent {
   id: string;
+  seriesId?: string;
   title: string;
   description: string;
   category: EventCategory;
@@ -115,4 +117,5 @@ export interface ChicagoEvent {
   startAt: string; // ISO datetime
   endAt?: string;  // ISO datetime
   link: string;
+  recurrence?: EventRecurrence;
 }
