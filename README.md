@@ -49,13 +49,6 @@ npm run db:studio
 - `DELETE /api/submissions?id=...` — delete one submission
 - `DELETE /api/submissions?year=YYYY&month=M` — delete submissions for a month
 
-## Team
-
-- **Aryan Panchal**
-- **Aarya Patel**
-
-Built for the DePaul Loop Life hackathon.
-
 ## Notes
 
 - Savings are estimates and may vary by provider and plan updates.
