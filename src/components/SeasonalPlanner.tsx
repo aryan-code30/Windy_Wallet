@@ -10,7 +10,7 @@ const SEASONS = [
     tips: [
       { icon: "🔥", label: "Heating spike", note: "Avg Chicago gas bill jumps to $120–$180/mo. Consider ComEd Budget Billing to flatten costs." },
       { icon: "🧥", label: "Layer up", note: "Set thermostat to 68°F when home, 60°F when away — saves ~$30/mo on heating." },
-      { icon: "🚇", label: "Skip Uber", note: "CTA runs 24/7. A monthly Ventra pass ($105) beats 10+ Uber rides in winter." },
+      { icon: "🚇", label: "Skip Uber", note: "CTA runs 24/7. A 30-day Ventra pass ($75) beats 5+ Uber rides in winter." },
       { icon: "🏛️", label: "Free warmth", note: "Chicago Cultural Center, Harold Washington Library — free heated spaces all day." },
     ],
     budget_note: "Budget +$60–$80 for higher heating & holiday spending",
@@ -22,7 +22,7 @@ const SEASONS = [
     color: "bg-pink-50 border-pink-200",
     badge: "bg-pink-100 text-pink-700",
     tips: [
-      { icon: "🚲", label: "Divvy Bike pass", note: "Annual Divvy pass is $119. If you ride 3x/week, you save vs. CTA + rideshare combo." },
+      { icon: "🚲", label: "Divvy Bike pass", note: "Annual Divvy membership is $143.90 ($99 for new members). If you ride 3x/week, you save vs. CTA + rideshare combo." },
       { icon: "🌳", label: "Free outdoors", note: "Riverwalk, Millennium Park, Maggie Daley — all free. Best outdoor months in the Loop." },
       { icon: "⚡", label: "Utility dip", note: "Spring is your cheapest utility season. Bank the savings toward summer A/C costs." },
       { icon: "🍜", label: "Lunch deals", note: "Many Loop restaurants do spring lunch specials — check Yelp/Google for weekday deals." },

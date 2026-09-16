@@ -1,12 +1,14 @@
 // src/lib/plans.ts
 // ─────────────────────────────────────────────────────────────
 //  WindyWallet — Curated Chicago Loop Plan Database
-//  Last verified: January 2026
-//  Sources: carrier websites, CTA.com, Metra.com, IL Dept of Insurance,
-//           ACA marketplace, personal experience living/working in the Loop
+//  Last verified: September 2026
+//  Sources: carrier websites, transitchicago.com, Metra.com, Divvy, IL Dept of Insurance,
+//           KFF / Get Covered Illinois, personal experience living/working in the Loop
 // ─────────────────────────────────────────────────────────────
 
-export const DATA_FRESHNESS = "Verified Jan 2026";
+export const DATA_VERIFIED = "Sep 2026";
+export const DATA_VERIFIED_LONG = "September 2026";
+export const DATA_FRESHNESS = `Verified ${DATA_VERIFIED}`;
 
 export const LOOP_ZIPS = new Set([
   "60601","60602","60603","60604","60605",
@@ -74,22 +76,23 @@ export const MOBILE_PLANS: MobilePlan[] = [
     provider: "Mint Mobile",
     cost: 30,
     data: "unlimited",
-    hotspot: true, hotspotGB: 40,
+    hotspot: true, hotspotGB: 20,
     intl: false,
     linesMax: 1,
     network: "T-Mobile",
     contractRequired: false,
     notes: [
       "T-Mobile 5G — excellent Loop coverage including underground stations",
-      "$30/mo when you buy 3+ months; $35 month-to-month",
-      "40 GB high-speed hotspot included — enough for WFH from Millennium Park",
+      "$30/mo on a 12-month plan ($35 on 6-month, $40 on 3-month)",
+      "New customers: intro promo has been $15/mo for the first term",
+      "20 GB hotspot included; 50 GB high-speed data before slowdowns in congestion",
     ],
     bestFor: "Best all-around single-line unlimited value in Chicago",
-    caveats: "Discounted rate requires 3-month upfront payment",
+    caveats: "$30 rate requires paying 12 months upfront",
   },
   {
     provider: "Consumer Cellular",
-    cost: 20,
+    cost: 25,
     data: "5",
     hotspot: false,
     intl: false,
@@ -105,26 +108,27 @@ export const MOBILE_PLANS: MobilePlan[] = [
     caveats: "No hotspot on base plan; upgrade required",
   },
   {
-    provider: "Metro by T-Mobile",
-    cost: 40,
+    provider: "Metro by T-Mobile Flex Unlimited",
+    cost: 50,
     data: "unlimited",
-    hotspot: true, hotspotGB: 15,
+    hotspot: true, hotspotGB: 8,
     intl: false,
     linesMax: 5,
     network: "T-Mobile",
     contractRequired: false,
     notes: [
       "Same T-Mobile towers, strong Loop 5G including Grant Park and Millennium Station",
-      "15 GB hotspot — solid for occasional laptop use",
+      "8 GB hotspot — fine for occasional laptop use",
+      "$50/mo with AutoPay, locked by Metro's 5-year price guarantee",
       "Walk-in stores throughout the Loop for in-person support",
     ],
     bestFor: "Loop residents who want unlimited + in-store support",
   },
   {
-    provider: "Cricket Wireless",
+    provider: "Cricket Supreme Unlimited",
     cost: 55,
     data: "unlimited",
-    hotspot: true, hotspotGB: 15,
+    hotspot: true, hotspotGB: 50,
     intl: false,
     linesMax: 5,
     network: "AT&T",
@@ -138,27 +142,27 @@ export const MOBILE_PLANS: MobilePlan[] = [
     caveats: "AT&T deprioritizes Cricket users during peak congestion on Michigan Ave",
   },
   {
-    provider: "Google Fi Unlimited",
+    provider: "Google Fi Unlimited Premium",
     cost: 65,
     data: "unlimited",
     hotspot: true, hotspotGB: 50,
     intl: true, intlDetails: "Unlimited calls/texts in 50+ countries; data at local rates",
     linesMax: 1,
-    network: "T-Mobile + US Cellular",
+    network: "T-Mobile",
     contractRequired: false,
     notes: [
-      "Switches between T-Mobile and US Cellular automatically for best signal",
+      "Runs on T-Mobile's 5G network — strong across the Loop",
       "Best choice if you travel internationally 3+ times per year",
       "50 GB hotspot — can replace home internet for light users",
     ],
     bestFor: "Frequent international travelers working downtown",
   },
   {
-    provider: "T-Mobile Go5G",
-    cost: 75,
+    provider: "T-Mobile Experience More",
+    cost: 85,
     data: "unlimited",
-    hotspot: true, hotspotGB: 50,
-    intl: true, intlDetails: "Unlimited talk/text in Mexico & Canada; $5/day international",
+    hotspot: true, hotspotGB: 60,
+    intl: true, intlDetails: "Unlimited talk/text + 15 GB data in Mexico & Canada; free texting to 210+ countries",
     linesMax: 1,
     network: "T-Mobile",
     contractRequired: false,
@@ -166,16 +170,17 @@ export const MOBILE_PLANS: MobilePlan[] = [
       "Premium T-Mobile tier — highest priority on the network, never deprioritized",
       "Best in-building Loop coverage when you need it to just work",
       "Scam Shield protection — blocks most spam calls",
+      "5-year price guarantee on the plan price",
     ],
     bestFor: "Power users who need premium reliability downtown",
-    caveats: "Worth it if you work from phone frequently; otherwise Mint does 90% for $30",
+    caveats: "Taxes & fees are extra. Worth it if you work from your phone; otherwise Mint does 90% for $30",
   },
 ];
 
 // ── INTERNET ───────────────────────────────────────────────
 // Reality check as a Loop resident:
 // - Comcast has the most coverage but charges a premium and bundles you
-// - RCN is genuinely competitive and under-used in Chicago
+// - Astound (formerly RCN) is genuinely competitive and under-used in Chicago
 // - T-Mobile Home Internet works great in most Loop ZIP codes (tested)
 // - Many Loop high-rises are MDU-wired for specific providers — check first
 export interface InternetPlan {
@@ -196,17 +201,18 @@ export interface InternetPlan {
 export const INTERNET_PLANS: InternetPlan[] = [
   {
     provider: "Comcast Internet Essentials",
-    cost: 9.95,
-    speed: 50, uploadSpeed: 10,
+    cost: 14.95,
+    speed: 75, uploadSpeed: 10,
     datacap: false,
     contractMonths: 0,
     equipmentFee: 0,
     eligibility: "lowincome",
     availability: "Widely available across all Loop ZIPs — Comcast has strong MDU presence",
     notes: [
-      "For households with K-12 students, seniors 62+, or SNAP/Medicaid recipients",
-      "Free modem included, no activation fee",
-      "50/10 Mbps — enough for streaming, video calls, light WFH",
+      "For households on SNAP, Medicaid, school lunch, housing assistance, etc. (income ≤ 200% FPL)",
+      "WiFi equipment included, no activation fee, no credit check",
+      "75/10 Mbps — enough for streaming, video calls, light WFH",
+      "Lifeline-eligible households can bring it to ~$5.70/mo",
       "Apply at internetessentials.com or call 1-855-846-8376",
     ],
     bestFor: "Income-qualified Loop residents — this is the best deal in the city",
@@ -214,8 +220,8 @@ export const INTERNET_PLANS: InternetPlan[] = [
   },
   {
     provider: "AT&T Access",
-    cost: 10,
-    speed: 25, uploadSpeed: 5,
+    cost: 30,
+    speed: 100,
     datacap: false,
     contractMonths: 0,
     equipmentFee: 0,
@@ -223,85 +229,85 @@ export const INTERNET_PLANS: InternetPlan[] = [
     availability: "Available in Loop ZIPs where AT&T fiber is present — check att.com/access",
     notes: [
       "For households receiving SNAP, SSI, Medicaid, or similar",
-      "No annual contract, no data caps",
-      "25 Mbps sufficient for 1-2 device households",
+      "No annual contract, no deposit, no equipment fee",
+      "$30/mo for up to 100 Mbps; $10–15/mo where only slower speeds are available",
     ],
     bestFor: "Income-qualified residents where AT&T fiber is available",
     caveats: "AT&T fiber availability varies by building in the Loop — confirm first",
   },
   {
-    provider: "RCN Chicago – Starter",
-    cost: 35,
-    speed: 200, uploadSpeed: 20,
+    provider: "Astound (RCN) 300 Mbps",
+    cost: 30,
+    speed: 300, uploadSpeed: 20,
     datacap: false,
     contractMonths: 0,
-    availability: "Strong in 60601, 60602, 60604, 60605, 60616 — check RCN.com/chicago",
+    availability: "Strong in 60601, 60602, 60604, 60605, 60616 — check astound.com",
     notes: [
-      "RCN is Chicago's most underrated ISP — genuinely cheaper than Comcast",
+      "Astound (formerly RCN) is Chicago's most underrated ISP — genuinely cheaper than Comcast",
       "No annual contract required, no data caps ever",
-      "200 Mbps more than enough for WFH video calls + streaming",
-      "Free self-install kit included",
+      "300 Mbps more than enough for WFH video calls + streaming",
+      "Price includes AutoPay discount ($10 off with bank account autopay)",
     ],
     bestFor: "Loop residents who want reliable internet without Comcast pricing",
-    caveats: "Not in all Loop buildings — verify address first at RCN.com",
+    caveats: "Not in all Loop buildings — verify address first at astound.com",
   },
   {
-    provider: "T-Mobile Home Internet",
+    provider: "T-Mobile Home Internet (Rely)",
     cost: 50,
-    speed: 200, uploadSpeed: 35,  // Chicago Loop avg based on Speedtest data
+    speed: 354, uploadSpeed: 15,  // "up to" speeds for the Rely plan
     datacap: false,
     contractMonths: 0,
     availability: "Available in most Loop ZIPs — strong 5G signal downtown",
     notes: [
       "5G home gateway — plug in and you're online in 15 minutes",
       "No contracts, no data caps, equipment included at no extra charge",
-      "Avg 200 Mbps down in Chicago Loop (Speedtest Intelligence, Q3 2024)",
+      "Up to 354 Mbps down; $35/mo if you also have a T-Mobile phone line",
       "Great for buildings where cable is expensive or unavailable",
     ],
     bestFor: "Loop renters who move frequently; building with expensive wired options",
-    caveats: "Upload speeds lower than fiber (~35 Mbps); not ideal for heavy uploading",
+    caveats: "Upload speeds much lower than fiber (~15 Mbps); not ideal for heavy uploading",
   },
   {
-    provider: "Xfinity Connect More",
-    cost: 55,
+    provider: "Xfinity 300 Mbps",
+    cost: 45,
     speed: 300, uploadSpeed: 20,
     datacap: false,
     contractMonths: 0,
-    equipmentFee: 15,
+    equipmentFee: 0,
     availability: "Xfinity available in virtually all Loop buildings",
     notes: [
       "Most widely available option in Loop MDU buildings",
-      "xFi gateway $15/mo or bring your own modem (saves $180/yr)",
-      "Introductory rate — confirm price after 12 months",
+      "WiFi equipment included, unlimited data",
+      "5-year price guarantee for new customers",
     ],
-    bestFor: "Buildings where RCN/T-Mobile aren't available",
-    caveats: "Bring your own modem (e.g. Motorola MB8600 ~$90) to avoid the $15/mo equipment fee",
+    bestFor: "Buildings where Astound/T-Mobile aren't available",
+    caveats: "5-year price lock requires AutoPay from a bank account + paperless billing",
   },
   {
-    provider: "RCN Chicago – Gig",
-    cost: 55,
+    provider: "Astound (RCN) 1 Gig",
+    cost: 50,
     speed: 1000, uploadSpeed: 50,
     datacap: false,
     contractMonths: 0,
-    availability: "Available in select Loop buildings — check RCN.com",
+    availability: "Available in select Loop buildings — check astound.com",
     notes: [
-      "Gigabit for $55/mo — best price-per-Mbps in Chicago",
+      "Gigabit for $50/mo with AutoPay — best price-per-Mbps in Chicago",
       "No data caps, no annual contract",
       "Symmetrical upload only available on select routes — verify",
     ],
     bestFor: "Power users, home studios, or anyone sharing with roommates",
   },
   {
-    provider: "Xfinity Gigabit",
-    cost: 80,
-    speed: 1200, uploadSpeed: 35,
+    provider: "Xfinity 1 Gig",
+    cost: 70,
+    speed: 1000, uploadSpeed: 35,
     datacap: false,
     contractMonths: 0,
-    equipmentFee: 15,
+    equipmentFee: 0,
     availability: "Available across all Loop ZIPs",
     notes: [
       "Best for 4+ person households or heavy streamers/gamers",
-      "xFi gateway included first year, then $15/mo — buy your own modem",
+      "WiFi equipment included; 5-year price guarantee with AutoPay + paperless billing",
     ],
     bestFor: "Large households or home offices with heavy bandwidth needs",
     caveats: "Most people don't need gigabit — 200-300 Mbps is plenty for 2-3 devices",
@@ -310,8 +316,9 @@ export const INTERNET_PLANS: InternetPlan[] = [
 
 // ── TRANSIT ────────────────────────────────────────────────
 // Reality check as a Loop commuter:
-// - CTA Unlimited Pass ($105) only worth it if you take 42+ rides/month (about 10.5/week)
-// - Below that, pay-per-ride at $2.50 ($2.25 with Ventra card) is cheaper
+// - CTA 30-Day Pass ($75) only worth it if you take 30+ rides/month (about 7/week)
+// - Below that, pay-per-ride ($2.50 L, $2.25 bus, free transfers) is cheaper
+// - 2026 fare hikes were cancelled after the Oct 2025 state transit funding bill
 // - Metra is NOT a substitute for CTA — it's suburb-to-Loop only
 // - Divvy is useful for last-mile, NOT a commuter solution
 // - Rideshare in the Loop is brutal ($12-25 avg) — almost never worth it daily
@@ -319,7 +326,7 @@ export const INTERNET_PLANS: InternetPlan[] = [
 
 export interface TransitOption {
   label: string;
-  officialCost2024: number;
+  officialCost: number;
   costNote: string;
   type: "cta"|"metra"|"other";
 }
@@ -327,73 +334,74 @@ export interface TransitOption {
 export const TRANSIT_OPTIONS: Record<string, TransitOption> = {
   "cta-monthly": {
     label: "CTA 30-Day Unlimited Pass (Ventra)",
-    officialCost2024: 105,
-    costNote: "Official CTA fare, effective through 2024",
+    officialCost: 75,
+    costNote: "Official CTA fare (unchanged for 2026)",
     type: "cta",
   },
   "cta-reduced": {
     label: "CTA Reduced Fare 30-Day Pass",
-    officialCost2024: 50,
-    costNote: "50% of standard fare — seniors 65+, disabled, Medicare card holders",
+    officialCost: 35,
+    costNote: "Requires a Reduced Fare permit — seniors 65+, riders with disabilities, Medicare card holders",
     type: "cta",
   },
   "cta-perride": {
     label: "CTA Pay-Per-Ride (Ventra Card)",
-    officialCost2024: 2.25,  // per ride with Ventra card
-    costNote: "$2.25/ride with Ventra card, $2.50 cash. Free transfer within 2 hours.",
+    officialCost: 2.50,  // L fare; bus is $2.25
+    costNote: "$2.50/ride on the L, $2.25 on the bus. Up to 2 free transfers within 2 hours.",
     type: "cta",
   },
   "metra-monthly-a": {
-    label: "Metra Monthly Pass – Zone A",
-    officialCost2024: 106,
-    costNote: "Chicago terminal stations: Union, Ogilvie, LaSalle, Millennium, Randolph",
+    label: "Metra Monthly Pass – Zones 1–2",
+    officialCost: 75,
+    costNote: "Chicago + inner-ring stations. Covers systemwide weekend travel.",
     type: "metra",
   },
   "metra-monthly-b": {
-    label: "Metra Monthly Pass – Zone B",
-    officialCost2024: 142,
-    costNote: "Stations 1 zone out from Chicago terminals",
-    type: "metra",
-  },
-  "metra-monthly-c": {
-    label: "Metra Monthly Pass – Zone C",
-    officialCost2024: 164,
+    label: "Metra Monthly Pass – Zones 1–3",
+    officialCost: 110,
     costNote: "Mid-distance suburban commute",
     type: "metra",
   },
+  "metra-monthly-c": {
+    label: "Metra Monthly Pass – Zones 1–4",
+    officialCost: 135,
+    costNote: "Outer suburbs to downtown",
+    type: "metra",
+  },
   "metra-10ride": {
-    label: "Metra 10-Ride Ticket",
-    officialCost2024: 0, // varies by zone
-    costNote: "Roughly 15% savings over 10 individual one-way tickets. Good for 2-3 days/week.",
+    label: "Metra Day Pass 5-Pack",  // replaced the 10-Ride Ticket in 2024
+    officialCost: 0, // varies by zone ($35.75–$64.25)
+    costNote: "5 Day Passes usable within 90 days. Good for 2-3 days/week.",
     type: "metra",
   },
   "rideshare": {
     label: "Rideshare (Uber / Lyft)",
-    officialCost2024: 15, // avg per trip in Loop
+    officialCost: 15, // avg per trip in Loop
     costNote: "Chicago Loop avg: $12-18/trip, surge pricing common during rush",
     type: "other",
   },
   "car": {
     label: "Personal Car (parking + gas + insurance)",
-    officialCost2024: 400, // conservative monthly estimate for Loop
+    officialCost: 400, // conservative monthly estimate for Loop
     costNote: "Loop parking monthly contract: $280-480. Daily: $25-45. Gas + wear add $100+",
     type: "other",
   },
   "divvy": {
     label: "Divvy Bike Share",
-    officialCost2024: 13.17, // $158/yr ÷ 12
-    costNote: "$158/year annual membership. Unlimited 45-min rides. 700+ Loop-area docks.",
+    officialCost: 11.99, // $143.90/yr ÷ 12
+    costNote: "$143.90/year annual membership ($99 for new or lapsed members). Unlimited 45-min classic rides.",
     type: "other",
   },
 };
 
 // ── INSURANCE ──────────────────────────────────────────────
 // Reality check as a Chicago Loop resident:
-// RENTERS: Most Loop studio/1BR renters massively overpay — $20-40/mo when $9-15 covers you
+// RENTERS: Chicago average is ~$23/mo; $12-17 covers most Loop studio/1BR renters
 // AUTO: Loop residents drive less than suburbanites — usage-based insurance (Root, Clearcover)
 //       often saves 20-35%. Monthly parking in a garage also means less theft risk.
-// HEALTH: ACA marketplace plans available in Cook County. Actual cost depends on income
-//         (subsidies can drop monthly premium to $0 for lower-income residents).
+// HEALTH: ACA marketplace plans via Get Covered Illinois (state-run since the 2026 plan year).
+//         Enhanced federal subsidies expired Dec 31, 2025; standard subsidies still apply.
+//         Illinois now loads silver premiums, so gold can be cheaper than silver.
 //         Northwestern Memorial and Rush are the main Loop hospital systems.
 
 export interface InsurancePlan {
@@ -411,7 +419,7 @@ export const INSURANCE_PLANS: Record<string, InsurancePlan[]> = {
   renters: [
     {
       provider: "Lemonade Renters",
-      monthly: 9,
+      monthly: 12,
       deductible: 500,
       coverage: "standard",
       notes: [
@@ -423,20 +431,8 @@ export const INSURANCE_PLANS: Record<string, InsurancePlan[]> = {
       bestFor: "Loop renters with standard apartment contents",
     },
     {
-      provider: "Hippo Insurance",
-      monthly: 10,
-      deductible: 500,
-      coverage: "standard",
-      notes: [
-        "Smart home coverage — free Notion sensor kit included",
-        "Covers electronics, home office equipment (important for WFH)",
-        "15-minute online quote and signup",
-      ],
-      bestFor: "Loop residents with home office gear or smart home devices",
-    },
-    {
       provider: "Allstate Renters",
-      monthly: 13,
+      monthly: 16,
       deductible: 500,
       coverage: "standard",
       notes: [
@@ -448,7 +444,7 @@ export const INSURANCE_PLANS: Record<string, InsurancePlan[]> = {
     },
     {
       provider: "State Farm Renters",
-      monthly: 15,
+      monthly: 17,
       deductible: 1000,
       coverage: "standard",
       notes: [
@@ -499,7 +495,7 @@ export const INSURANCE_PLANS: Record<string, InsurancePlan[]> = {
     },
     {
       provider: "GEICO Illinois",
-      monthly: 108,
+      monthly: 169,
       deductible: 1000,
       coverage: "standard",
       notes: [
@@ -511,26 +507,28 @@ export const INSURANCE_PLANS: Record<string, InsurancePlan[]> = {
     },
   ],
   health: [
-    // ACA Marketplace plans for Cook County, 2024 plan year
-    // Actual premiums vary by age and income — these are benchmark rates for ~35yo, no subsidy
+    // ACA Marketplace plans, 2026 plan year
+    // Estimates based on KFF 2026 Illinois averages for a 40-year-old before subsidies:
+    // benchmark silver $646, lowest bronze $389, lowest gold ~83% of benchmark silver.
+    // Actual premiums vary by age, county and income.
     {
       provider: "Ambetter Balanced Care (Silver)",
-      monthly: 248,
+      monthly: 620,
       deductible: 5000,
       coverage: "standard",
       network: "Cook County Medicaid-expansion network",
       notes: [
         "ACA Silver — benchmark plan for subsidy calculations",
         "Telehealth included at $0 copay",
-        "Check if you qualify for APTC subsidy — could reduce to $0-80/mo",
+        "Check subsidy eligibility — eligible Illinois enrollees saved ~$688/mo on average in 2026",
         "In-network: Cook County Health, Loretto Hospital",
       ],
       bestFor: "Loop residents who qualify for ACA subsidies",
-      warnings: "Check your APTC eligibility at healthcare.gov — many Loop residents pay far less than sticker price",
+      warnings: "Check your subsidy eligibility at getcoveredillinois.gov — many Loop residents pay far less than sticker price",
     },
     {
       provider: "Oscar Health Silver",
-      monthly: 278,
+      monthly: 646,
       deductible: 4500,
       coverage: "standard",
       network: "Northwestern Memorial, Northwestern Medical Group",
@@ -544,7 +542,7 @@ export const INSURANCE_PLANS: Record<string, InsurancePlan[]> = {
     },
     {
       provider: "Molina Marketplace (Bronze)",
-      monthly: 198,
+      monthly: 389,
       deductible: 8700,
       coverage: "basic",
       network: "Cook County network",
@@ -554,17 +552,17 @@ export const INSURANCE_PLANS: Record<string, InsurancePlan[]> = {
         "Free preventive care (annual physical, vaccines)",
       ],
       bestFor: "Healthy 20-35yo Loop residents who want lowest monthly cost",
-      warnings: "High deductible ($8,700) means you pay most costs out of pocket until met — build an HSA",
+      warnings: "High deductible ($8,700) means you pay most costs out of pocket until met. Molina is leaving the Illinois marketplace after 2026 — plan to re-shop at open enrollment.",
     },
     {
       provider: "BCBS of IL PPO Gold",
-      monthly: 389,
+      monthly: 536,
       deductible: 1500,
       coverage: "premium",
       network: "Widest Chicago network — Rush, NMH, UI Health, Advocate",
       notes: [
         "Every major Loop hospital system in-network",
-        "Lower deductible than Silver plans",
+        "Lower deductible than Silver — and in 2026 Illinois gold often costs less than silver",
         "PPO means no referrals needed — see any in-network specialist directly",
         "Best if you have ongoing medical needs or specialist visits",
       ],
