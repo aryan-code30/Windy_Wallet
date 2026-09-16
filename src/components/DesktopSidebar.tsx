@@ -77,7 +77,7 @@ export default function DesktopSidebar({ step, form, result, onStepClick }: Prop
 
       {/* ── Live savings panel ── */}
       {result && (
-        <div className="rounded-2xl overflow-hidden shadow-sm"
+        <div className="light-palette rounded-2xl overflow-hidden shadow-sm"
           style={{ background: "linear-gradient(135deg,#1E40AF,#6D28D9)" }}>
           <div className="px-4 py-4">
             <p className="text-[9px] font-bold uppercase tracking-widest text-white/50 mb-1">Monthly Savings</p>

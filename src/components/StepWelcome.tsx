@@ -67,7 +67,7 @@ export default function StepWelcome({ form, patch, onNext }: {
     <div className="animate-fade-up">
 
       {/* ── Dark hero banner ───────────────────────────── */}
-      <div className="relative rounded-3xl overflow-hidden mb-6"
+      <div className="light-palette relative rounded-3xl overflow-hidden mb-6"
         style={{ background: "linear-gradient(135deg,#0F172A 0%,#1E1B4B 60%,#0F172A 100%)" }}>
 
         {/* Background orbs */}

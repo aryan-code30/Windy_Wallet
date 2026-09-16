@@ -19,7 +19,7 @@ function ResultsSkeleton() {
   return (
     <div className="animate-fade-up">
       {/* Hero skeleton */}
-      <div className="rounded-2xl p-10 mb-6" style={{ background: "linear-gradient(135deg,#EFF6FF,#F5F3FF)" }}>
+      <div className="rounded-2xl p-10 mb-6 bg-gradient-to-br from-primary-light to-accent-light">
         <Skeleton h="h-4" w="w-32" rounded="rounded-full" />
         <div className="mt-3 mb-2"><Skeleton h="h-16" w="w-48" rounded="rounded-xl" /></div>
         <Skeleton h="h-4" w="w-56" rounded="rounded-lg" />
@@ -736,7 +736,7 @@ export default function StepResults({ result, loading, error, form, onBack, onRe
       <div className="grid grid-cols-1 sm:grid-cols-[1fr_300px] gap-4 mb-6">
 
         {/* Savings hero */}
-        <div className="rounded-2xl p-8 text-white relative overflow-hidden"
+        <div className="light-palette rounded-2xl p-8 text-white relative overflow-hidden"
           style={{ background: "linear-gradient(135deg,#2563EB 0%,#7C3AED 100%)" }}>
           <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full opacity-10 bg-white pointer-events-none" />
           <div className="relative z-10">

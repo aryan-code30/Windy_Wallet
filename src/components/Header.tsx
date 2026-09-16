@@ -1,5 +1,6 @@
 "use client";
 import { useViewMode } from "./ViewModeContext";
+import ThemeToggle from "./ThemeToggle";
 
 const STEP_LABELS = ["Location", "Categories", "Bills", "Discounts", "Results"];
 const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -12,7 +13,7 @@ export default function Header({ step, totalSteps }: { step: number; totalSteps:
 
   return (
     <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-gray-200/70">
-      <div className="max-w-screen-xl mx-auto px-5 h-16 flex items-center justify-between gap-4">
+      <div className="max-w-screen-xl mx-auto px-3 sm:px-5 h-16 flex items-center justify-between gap-2 sm:gap-4">
 
         {/* ── Logo ── */}
         <div className="flex items-center gap-2.5 flex-shrink-0">
@@ -27,12 +28,12 @@ export default function Header({ step, totalSteps }: { step: number; totalSteps:
                 Wallet
               </span>
             </div>
-            <div className="text-[9px] text-gray-400 tracking-widest mt-0.5 uppercase">Chicago Loop · {CURRENT_LABEL}</div>
+            <div className="hidden sm:block text-[9px] text-gray-400 tracking-widest mt-0.5 uppercase">Chicago Loop · {CURRENT_LABEL}</div>
           </div>
         </div>
 
-        {/* ── Step label (center) ── */}
-        <div className="flex-1 flex justify-center">
+        {/* ── Step label (center, hidden on narrow screens to fit the toggles) ── */}
+        <div className="flex-1 hidden sm:flex justify-center">
           {step < totalSteps - 1 && (
             <div className="text-xs font-semibold text-gray-400">
               Step <span className="text-gray-700">{step + 1}</span> of {totalSteps - 1} —{" "}
@@ -44,14 +45,15 @@ export default function Header({ step, totalSteps }: { step: number; totalSteps:
           )}
         </div>
 
-        {/* ── View mode toggle ── */}
-        <div className="flex-shrink-0 flex items-center gap-2">
+        {/* ── Theme + view mode toggles ── */}
+        <div className="flex-shrink-0 ml-auto flex items-center gap-1.5 sm:gap-2">
+          <ThemeToggle />
           <span className="hidden sm:block text-[10px] font-bold uppercase tracking-widest text-gray-400">View</span>
           <div className="flex items-center bg-gray-100 rounded-full p-0.5 gap-0.5">
             <button
               onClick={() => setMode("mobile")}
               title="Mobile layout"
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-all duration-200 ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] font-bold transition-all duration-200 ${
                 mode === "mobile"
                   ? "bg-white text-gray-900 shadow-sm"
                   : "text-gray-400 hover:text-gray-600"
@@ -66,7 +68,7 @@ export default function Header({ step, totalSteps }: { step: number; totalSteps:
             <button
               onClick={() => setMode("desktop")}
               title="Desktop layout"
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-all duration-200 ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] font-bold transition-all duration-200 ${
                 mode === "desktop"
                   ? "bg-white text-gray-900 shadow-sm"
                   : "text-gray-400 hover:text-gray-600"

@@ -82,7 +82,7 @@ export default function SavingsChart() {
           return (
             <div key={r.id} className="flex-1 flex flex-col items-center gap-1 group relative">
               {/* tooltip */}
-              <div className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[9px] rounded px-1.5 py-0.5 whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-10">
+              <div className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 light-palette bg-gray-800 text-white text-[9px] rounded px-1.5 py-0.5 whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-10">
                 ${r.totalSavings.toFixed(2)}<br/>{MONTHS[r.month-1]} {r.year}
               </div>
               <div className="w-full flex flex-col justify-end" style={{ height: "88px" }}>

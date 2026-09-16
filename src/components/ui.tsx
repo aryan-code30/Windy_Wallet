@@ -120,11 +120,11 @@ export function Toggle({ checked, onChange, label, sub }: {
         type="button"
         onClick={() => onChange(!checked)}
         className="relative flex-shrink-0 w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/30"
-        style={{ background: checked ? "#2563EB" : "#E5E7EB" }}
+        style={{ background: checked ? "#2563EB" : "rgb(var(--ww-gray-200))" }}
         role="switch" aria-checked={checked}
       >
         <span
-          className="absolute top-[3px] w-[18px] h-[18px] bg-white rounded-full shadow-sm transition-all duration-200"
+          className="light-palette absolute top-[3px] w-[18px] h-[18px] bg-white rounded-full shadow-sm transition-all duration-200"
           style={{ left: checked ? 23 : 3 }}
         />
       </button>

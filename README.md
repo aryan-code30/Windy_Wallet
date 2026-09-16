@@ -11,6 +11,7 @@ It analyzes your mobile, internet, transit, and insurance costs, compares them a
 - Chicago Loop ZIP validation (`60601–60607`, `60611`, `60616`, `60661`)
 - Discount-aware recommendations (senior, veteran, disability, income-qualified, etc.)
 - Budget impact + savings breakdown
+- Light, dark, and system-matched color themes
 - Built-in tools: history chart, transit planner, grocery map, seasonal planner, bill tracker, events calendar
 
 ## Quick Start
