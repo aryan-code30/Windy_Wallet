@@ -1,8 +1,16 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { Card, CardLabel, Grid2, Field, Input, Notice, BtnRow, Btn } from "./ui";
-import { LOOP_ZIPS } from "@/lib/plans";
+import { LOOP_ZIPS, DATA_VERIFIED } from "@/lib/plans";
 import type { FormState } from "@/types";
+
+// Two years back through next year, always including the currently selected year
+function yearOptions(selected: number): number[] {
+  const current = new Date().getFullYear();
+  const years = [current - 2, current - 1, current, current + 1];
+  if (!years.includes(selected)) years.push(selected);
+  return years.sort((a, b) => a - b);
+}
 
 const ALL_ZIPS = ["60601","60602","60603","60604","60605","60606","60607","60611","60616","60661"];
 
@@ -137,7 +145,7 @@ export default function StepWelcome({ form, patch, onNext }: {
         {[
           ["~$280", "Avg monthly savings", "text-blue-600"],
           ["10",    "Loop ZIP codes",       "text-violet-600"],
-          ["Mar 2026", "Data verified",     "text-emerald-600"],
+          [DATA_VERIFIED, "Data verified",  "text-emerald-600"],
         ].map(([v, l, cls]) => (
           <div key={l} className="bg-white border border-gray-100 rounded-2xl p-4 text-center shadow-sm">
             <div className={`font-display text-2xl font-extrabold tracking-tight ${cls} mb-1`}>{v}</div>
@@ -213,7 +221,7 @@ export default function StepWelcome({ form, patch, onNext }: {
               value={form.year}
               onChange={e => patch("year", Number(e.target.value))}
             >
-              {[2024, 2025, 2026, 2027].map(y => (
+              {yearOptions(form.year).map(y => (
                 <option key={y} value={y}>{y}</option>
               ))}
             </select>

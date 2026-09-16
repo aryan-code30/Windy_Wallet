@@ -19,4 +19,7 @@ model Submission {
   year           Int      @default(2026)
   billsSnapshot  String   @default("{}") // JSON stringified bill data
   createdAt      DateTime @default(now())
+  ownerId        String?  // anonymous per-browser id from the ww_owner cookie
+
+  @@index([ownerId])
 }

@@ -922,7 +922,7 @@ export default function StepResults({ result, loading, error, form, onBack, onRe
         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
         All pricing sourced from public provider websites · {generatedAt}
         <span className="mx-1">·</span>
-        <a href="https://www.cta.com/fares" target="_blank" rel="noopener noreferrer"
+        <a href="https://www.transitchicago.com/fares/" target="_blank" rel="noopener noreferrer"
           className="text-primary underline underline-offset-2">CTA fares</a>
         <span className="mx-1">·</span>
         <a href="https://metra.com/fares" target="_blank" rel="noopener noreferrer"

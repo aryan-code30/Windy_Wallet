@@ -3,17 +3,19 @@ import { useState } from "react";
 
 type CommuteType = "loop-only" | "suburb-loop" | "mixed";
 
+const CTA_PASS = 75; // CTA 30-Day Pass, 2026
+
 const ROUTES = [
   {
     id: "cta-monthly",
-    name: "CTA Monthly Ventra Pass",
+    name: "CTA 30-Day Ventra Pass",
     emoji: "🚇",
-    cost: 105,
+    cost: CTA_PASS,
     period: "month",
     best_for: ["loop-only", "mixed"] as CommuteType[],
     description: "Unlimited rides on all CTA trains & buses for 30 days.",
     link: "https://www.ventrachicago.com/products/30-day-pass/",
-    tips: ["Buy online to avoid station markup", "Auto-reload saves $5/yr", "Works on both L and bus"],
+    tips: ["Breaks even at 30 L rides a month ($2.50 each)", "Set up auto-reload in the Ventra app", "Works on both L and bus"],
     color: "bg-blue-50 border-blue-200",
     badge: "bg-blue-100 text-blue-700",
   },
@@ -21,25 +23,25 @@ const ROUTES = [
     id: "metra-monthly",
     name: "Metra Monthly Pass",
     emoji: "🚆",
-    cost: 178,
+    cost: 110,
     period: "month",
     best_for: ["suburb-loop"] as CommuteType[],
-    description: "Unlimited rides on your Metra zone. Best if commuting from suburbs daily.",
-    link: "https://metrarail.com/tickets-and-fares/monthly-passes",
-    tips: ["Metra/CTA combo pass saves ~$30/mo vs. buying separately", "10-ride ticket cheaper if <15 trips/mo", "Senior half-price with Ventra RTA Reduced Fare"],
+    description: "Unlimited rides in your zones ($75 Zones 1–2, $110 Zones 1–3, $135 Zones 1–4). Best if commuting from suburbs daily.",
+    link: "https://metra.com/fares",
+    tips: ["Add the $30 Regional Connect Pass for unlimited CTA + Pace", "Day Pass 5-Pack is cheaper if you ride only 2–3 days a week", "Seniors ride at reduced fare with an RTA Reduced Fare permit"],
     color: "bg-emerald-50 border-emerald-200",
     badge: "bg-emerald-100 text-emerald-700",
   },
   {
     id: "divvy-annual",
-    name: "Divvy Annual Bike Pass",
+    name: "Divvy Annual Membership",
     emoji: "🚲",
-    cost: 119,
+    cost: 143.90,
     period: "year",
     best_for: ["loop-only", "mixed"] as CommuteType[],
     description: "Unlimited 45-min classic bike rides. Perfect for Loop neighborhood trips.",
     link: "https://divvybikes.com/pricing",
-    tips: ["$9.92/mo amortized — cheaper than 2 Uber rides", "300+ stations in Loop/Near North", "Combine with CTA for suburb commuters"],
+    tips: ["$11.99/mo amortized ($8.25 at the $99 new-member price)", "300+ stations in Loop/Near North", "Combine with CTA for suburb commuters"],
     color: "bg-pink-50 border-pink-200",
     badge: "bg-pink-100 text-pink-700",
   },
@@ -65,7 +67,7 @@ const ROUTES = [
     best_for: ["loop-only"] as CommuteType[],
     description: "Most Loop destinations are within a 15-min walk. Best in spring/fall.",
     link: "https://maps.google.com/?q=Chicago+Loop",
-    tips: ["Save $105/mo if you can walk your full commute", "Chicago Riverwalk + lakeshore paths are scenic routes", "CTA single ride $2.50 for bad weather days"],
+    tips: ["Save $75/mo if you can walk your full commute", "Chicago Riverwalk + lakeshore paths are scenic routes", "CTA single ride $2.50 for bad weather days"],
     color: "bg-gray-50 border-gray-200",
     badge: "bg-gray-100 text-gray-600",
   },
@@ -86,9 +88,9 @@ const ROUTES = [
 
 const COMPARE: { label: string; trips: number; mode: string; cost: number }[] = [
   { label: "Walk (Loop only)",         trips: 20, mode: "🚶 Walk",              cost: 0   },
-  { label: "CTA Monthly Pass",         trips: 40, mode: "🚇 CTA Ventra",        cost: 105 },
-  { label: "Divvy Annual (÷12)",       trips: 30, mode: "🚲 Divvy",             cost: 10  },
-  { label: "Metra Monthly",            trips: 40, mode: "🚆 Metra",             cost: 178 },
+  { label: "CTA 30-Day Pass",          trips: 40, mode: "🚇 CTA Ventra",        cost: CTA_PASS },
+  { label: "Divvy Annual (÷12)",       trips: 30, mode: "🚲 Divvy",             cost: 12  },
+  { label: "Metra Monthly (Zones 1–3)", trips: 40, mode: "🚆 Metra",            cost: 110 },
   { label: "Uber/Lyft (avg $18/ride)", trips: 20, mode: "🚗 Rideshare",         cost: 360 },
   { label: "Parking + Gas",            trips: 20, mode: "🚘 Drive",             cost: 420 },
 ];
@@ -171,13 +173,13 @@ export default function TransitPlanner() {
           <div key={c.label} className="space-y-1">
             <div className="flex items-center justify-between">
               <span className="text-xs text-gray-600">{c.mode}</span>
-              <span className={`text-xs font-bold ${c.cost === 0 ? "text-emerald-600" : c.cost <= 105 ? "text-indigo-600" : "text-red-500"}`}>
+              <span className={`text-xs font-bold ${c.cost === 0 ? "text-emerald-600" : c.cost <= CTA_PASS ? "text-indigo-600" : "text-red-500"}`}>
                 {c.cost === 0 ? "Free" : `$${c.cost}/mo`}
               </span>
             </div>
             <div className="w-full bg-gray-100 rounded-full h-1.5">
               <div
-                className={`h-1.5 rounded-full ${c.cost === 0 ? "bg-emerald-400" : c.cost <= 105 ? "bg-indigo-400" : "bg-red-300"}`}
+                className={`h-1.5 rounded-full ${c.cost === 0 ? "bg-emerald-400" : c.cost <= CTA_PASS ? "bg-indigo-400" : "bg-red-300"}`}
                 style={{ width: `${Math.max((c.cost / maxCost) * 100, 2)}%` }}
               />
             </div>

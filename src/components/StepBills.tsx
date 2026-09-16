@@ -188,15 +188,15 @@ export default function StepBills({ form, patchBill, patchInsurance, onBack, onN
               <Select value={b.transit.mode} onChange={e => patchBill("transit","mode",e.target.value)}>
                 <option value="">Select your main method</option>
                 <optgroup label="CTA (L + Bus)">
-                  <option value="cta-monthly">CTA 30-Day Unlimited Pass ($105)</option>
-                  <option value="cta-reduced">CTA Reduced Fare 30-Day Pass ($50)</option>
+                  <option value="cta-monthly">CTA 30-Day Unlimited Pass ($75)</option>
+                  <option value="cta-reduced">CTA Reduced Fare 30-Day Pass ($35)</option>
                   <option value="cta-perride">CTA Pay-Per-Ride via Ventra</option>
                 </optgroup>
                 <optgroup label="Metra (Commuter Rail)">
-                  <option value="metra-monthly-a">Metra Monthly Pass – Zone A ($106)</option>
-                  <option value="metra-monthly-b">Metra Monthly Pass – Zone B ($142)</option>
-                  <option value="metra-monthly-c">Metra Monthly Pass – Zone C ($164)</option>
-                  <option value="metra-10ride">Metra 10-Ride Tickets</option>
+                  <option value="metra-monthly-a">Metra Monthly Pass – Zones 1–2 ($75)</option>
+                  <option value="metra-monthly-b">Metra Monthly Pass – Zones 1–3 ($110)</option>
+                  <option value="metra-monthly-c">Metra Monthly Pass – Zones 1–4 ($135)</option>
+                  <option value="metra-10ride">Metra Day Pass 5-Pack</option>
                 </optgroup>
                 <optgroup label="Other">
                   <option value="rideshare">Rideshare (Uber / Lyft)</option>
@@ -206,7 +206,7 @@ export default function StepBills({ form, patchBill, patchInsurance, onBack, onN
               </Select>
             </Field>
             <Field label="Monthly Transit Spend" hint="All transit costs combined (passes + Uber + parking)">
-              <Input dollar type="number" placeholder="105" min="0" step="0.01"
+              <Input dollar type="number" placeholder="75" min="0" step="0.01"
                 value={b.transit.cost || ""}
                 onChange={e => patchBill("transit","cost", num(e.target.value))} />
             </Field>

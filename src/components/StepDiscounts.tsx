@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Card, CardLabel, Eyebrow, PageTitle, Grad, Subtitle, Field, Input, CheckCard, Notice, BtnRow, Btn } from "./ui";
+import { DATA_VERIFIED_LONG } from "@/lib/plans";
 import type { FormState, DiscountType } from "@/types";
 
 const DISCOUNTS: {
@@ -17,13 +18,13 @@ const DISCOUNTS: {
     id: "disability", emoji: "♿", label: "Disability",
     sub: "ADA-recognized disability, SSI, or SSDI recipient",
     pct: 12,
-    programs: "CTA Reduced Fare ($50/mo), Comcast Internet Essentials, AT&T Access, reduced insurance rates",
+    programs: "CTA Reduced Fare ($35/mo), Comcast Internet Essentials, AT&T Access, reduced insurance rates",
   },
   {
     id: "senior", emoji: "🧓", label: "Senior (Age 65+)",
     sub: "Age 65 or older",
     pct: 12,
-    programs: "CTA Reduced Fare ($50/mo), Metra 50% discount, Consumer Cellular AARP 5% off, Medicare health plans",
+    programs: "CTA Reduced Fare ($35/mo), Metra 50% discount, Consumer Cellular AARP 5% off, Medicare health plans",
   },
   {
     id: "frontline", emoji: "🏥", label: "Frontline Worker",
@@ -166,7 +167,7 @@ export default function StepDiscounts({ form, patch, onBack, onSubmit }: {
             </p>
             <p className="text-xs text-gray-400 leading-relaxed">
               I understand that eligibility for discount programs is self-attested. WindyWallet shows available options based on what you tell us — final eligibility is verified by each provider.
-              All pricing is sourced from publicly available provider websites as of January 2026.
+              All pricing is sourced from publicly available provider websites as of {DATA_VERIFIED_LONG}.
             </p>
           </div>
         </button>

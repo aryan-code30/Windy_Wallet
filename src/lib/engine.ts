@@ -233,7 +233,7 @@ export function analyzeInternet(
     discountPct: discMult > 0 && !best.eligibility ? pct(discMult) : undefined,
     alreadyOptimal: false,
     note: best.caveats || (best.eligibility ? "⚠️ Income-qualified program — eligibility verification required at sign-up." : undefined),
-    warning: best.provider.includes("Xfinity") ? "Confirm price after 12-month promotional period. Set a calendar reminder." : undefined,
+    warning: best.provider.includes("Xfinity") ? "The 5-year price lock requires AutoPay from a bank account and paperless billing." : undefined,
     dataFreshness: DATA_FRESHNESS,
   };
 }
@@ -250,11 +250,15 @@ export function analyzeTransit(
   const freq               = bill.freq || 10;
   const tripsPerMonth      = Math.round(freq * 4.33); // avg weeks/month
 
-  // CTA break-even: $105 / $2.25 = 46.7 rides. If you take < 47 rides/month,
-  // pay-per-ride is cheaper than the monthly pass.
-  const CTA_UNLIMITED = 105;
-  const CTA_REDUCED   = 50;
-  const CTA_PER_RIDE  = 2.25;
+  // Official fares from TRANSIT_OPTIONS (2026 — fare hikes were cancelled).
+  // CTA break-even: $75 / $2.50 = 30 rides. If you take < 30 rides/month,
+  // pay-per-ride is cheaper than the 30-day pass.
+  const CTA_UNLIMITED = TRANSIT_OPTIONS["cta-monthly"].officialCost;
+  const CTA_REDUCED   = TRANSIT_OPTIONS["cta-reduced"].officialCost;
+  const CTA_PER_RIDE  = TRANSIT_OPTIONS["cta-perride"].officialCost;
+  const CTA_BREAKEVEN = Math.ceil(CTA_UNLIMITED / CTA_PER_RIDE);
+  // Suburb commuters: quote the Zones 1–3 pass as a mid-range estimate
+  const METRA_MONTHLY = TRANSIT_OPTIONS["metra-monthly-b"].officialCost;
   const ctaPayPerRideMonthly = r2(tripsPerMonth * CTA_PER_RIDE);
 
   let rec: { option: string; cost: number; note: string } | null = null;
@@ -266,20 +270,20 @@ export function analyzeTransit(
       // Daily rideshare to Loop is shockingly expensive — most compelling switch
       const rideshareMonthly = tripsPerMonth * 15; // avg $15 Loop rideshare trip
       rec = {
-        option: "Metra Zone A Monthly Pass",
-        cost: 106,
-        note: `At ${freq} trips/week that's ~${tripsPerMonth} rideshares/mo. At $15 avg that's $${rideshareMonthly}/mo vs Metra's $106. Metra Union Station and Ogilvie are in the Loop.`,
+        option: "Metra Monthly Pass (Zones 1–3)",
+        cost: METRA_MONTHLY,
+        note: `At ${freq} trips/week that's ~${tripsPerMonth} rideshares/mo. At $15 avg that's $${rideshareMonthly}/mo vs Metra's $${METRA_MONTHLY} (Zones 1–2 is $75, Zones 1–4 is $135). Metra Union Station and Ogilvie are in the Loop.`,
       };
       reasons = [
         { factor: "Metra is faster than rideshare during rush hour (no traffic)", impact: "high" },
         { factor: "Predictable schedule vs surge pricing uncertainty", impact: "high" },
-        { factor: `Save $${r2(rideshareMonthly - 106)}/mo vs rideshare`, impact: "high" },
+        { factor: `Save $${r2(rideshareMonthly - METRA_MONTHLY)}/mo vs rideshare`, impact: "high" },
       ];
     } else if (bill.mode === "car") {
       rec = {
-        option: "Metra Zone A Monthly Pass",
-        cost: 106,
-        note: "Loop parking runs $280-480/mo for monthly contracts, $25-45/day for daily. Metra + occasional Divvy covers most Loop needs for $106-120/mo total.",
+        option: "Metra Monthly Pass (Zones 1–3)",
+        cost: METRA_MONTHLY,
+        note: `Loop parking runs $280-480/mo for monthly contracts, $25-45/day for daily. A Metra monthly pass ($75–135 by zone) plus the $30 Regional Connect Pass for unlimited CTA covers most Loop needs.`,
       };
       reasons = [
         { factor: "Eliminates $280-480/mo Loop parking cost", impact: "high" },
@@ -289,7 +293,7 @@ export function analyzeTransit(
     } else if (isSeniorOrDisabled && !bill.mode.includes("reduced")) {
       rec = {
         option: "Metra Reduced Fare Monthly Pass",
-        cost: Math.round(106 * 0.50),
+        cost: Math.round(METRA_MONTHLY * 0.50),
         note: "Seniors 65+ and disabled riders qualify for 50% off Metra monthly passes. Apply at any Metra ticket window with valid ID.",
       };
       reasons = [{ factor: "50% fare reduction — official Metra program", impact: "high" }];
@@ -311,29 +315,29 @@ export function analyzeTransit(
         rec = {
           option: "CTA Reduced Fare 30-Day Pass (Ventra)",
           cost: CTA_REDUCED,
-          note: "Seniors 65+, disabled riders, and Medicare cardholders pay $50/mo for unlimited rides. Apply at any Ventra kiosk or CTA station with valid ID.",
+          note: `Seniors 65+, riders with disabilities, and Medicare cardholders pay $${CTA_REDUCED}/mo for unlimited rides with an RTA Reduced Fare permit.`,
         };
         reasons = [{ factor: "50% CTA discount — you qualify, apply today", impact: "high" }];
       }
-    } else if (tripsPerMonth < 47 && bill.cost >= CTA_UNLIMITED) {
+    } else if (tripsPerMonth < CTA_BREAKEVEN && bill.cost >= CTA_UNLIMITED) {
       // Pay-per-ride is cheaper than monthly pass
       if (ctaPayPerRideMonthly < CTA_UNLIMITED) {
         rec = {
           option: "CTA Ventra Pay-Per-Ride",
           cost: ctaPayPerRideMonthly,
-          note: `At ${freq} trips/week (~${tripsPerMonth}/mo) × $2.25 = $${ctaPayPerRideMonthly}/mo. The monthly pass breaks even at 47 rides/month. You're under that threshold.`,
+          note: `At ${freq} trips/week (~${tripsPerMonth}/mo) × $${CTA_PER_RIDE.toFixed(2)} = $${ctaPayPerRideMonthly}/mo. The 30-day pass breaks even at ${CTA_BREAKEVEN} rides/month. You're under that threshold.`,
         };
         reasons = [
-          { factor: `${tripsPerMonth} trips/mo × $2.25 = $${ctaPayPerRideMonthly} — less than $105 unlimited pass`, impact: "high" },
+          { factor: `${tripsPerMonth} trips/mo × $${CTA_PER_RIDE.toFixed(2)} = $${ctaPayPerRideMonthly} — less than the $${CTA_UNLIMITED} 30-day pass`, impact: "high" },
           { factor: "Free 2-hour transfer window covers most Loop trips", impact: "medium" },
         ];
       }
-    } else if (tripsPerMonth >= 47 && bill.mode !== "cta-monthly" && bill.cost > CTA_UNLIMITED) {
+    } else if (tripsPerMonth >= CTA_BREAKEVEN && bill.mode !== "cta-monthly" && bill.cost > CTA_UNLIMITED) {
       // Heavy CTA user on wrong plan
       rec = {
         option: "CTA 30-Day Unlimited Pass (Ventra)",
         cost: CTA_UNLIMITED,
-        note: `At ${tripsPerMonth} rides/month the unlimited pass at $105 is cheaper than pay-per-ride ($${ctaPayPerRideMonthly}) and covers all CTA buses and L trains.`,
+        note: `At ${tripsPerMonth} rides/month the 30-day pass at $${CTA_UNLIMITED} is cheaper than pay-per-ride ($${ctaPayPerRideMonthly}) and covers all CTA buses and L trains.`,
       };
       reasons = [
         { factor: `At ${tripsPerMonth} trips/mo, unlimited pass beats pay-per-ride by $${r2(ctaPayPerRideMonthly - CTA_UNLIMITED)}`, impact: "high" },
@@ -343,14 +347,14 @@ export function analyzeTransit(
       // Using rideshare for Loop trips is almost always wrong
       const rideMonthly = tripsPerMonth * 14;
       rec = {
-        option: tripsPerMonth >= 47 ? "CTA 30-Day Unlimited Pass (Ventra)" : "CTA Ventra Pay-Per-Ride",
-        cost: tripsPerMonth >= 47 ? CTA_UNLIMITED : ctaPayPerRideMonthly,
+        option: tripsPerMonth >= CTA_BREAKEVEN ? "CTA 30-Day Unlimited Pass (Ventra)" : "CTA Ventra Pay-Per-Ride",
+        cost: tripsPerMonth >= CTA_BREAKEVEN ? CTA_UNLIMITED : ctaPayPerRideMonthly,
         note: `Using rideshare for Loop trips at ~$14/trip means ~$${rideMonthly}/mo. The L covers the entire Loop and runs every 5-8 minutes during rush hour.`,
       };
       reasons = [
         { factor: "CTA L covers entire Loop — no traffic delays", impact: "high" },
         { factor: "L runs every 5-8 min during rush hour, 15-20 min overnight", impact: "medium" },
-        { factor: `Save ~$${r2(rideMonthly - (tripsPerMonth >= 47 ? CTA_UNLIMITED : ctaPayPerRideMonthly))}/mo vs rideshare`, impact: "high" },
+        { factor: `Save ~$${r2(rideMonthly - (tripsPerMonth >= CTA_BREAKEVEN ? CTA_UNLIMITED : ctaPayPerRideMonthly))}/mo vs rideshare`, impact: "high" },
       ];
     }
   }
@@ -359,8 +363,8 @@ export function analyzeTransit(
 
   if (!rec || rec.cost >= bill.cost) {
     let optimalReason = "";
-    if (bill.mode === "cta-monthly" && tripsPerMonth >= 47 && !isSeniorOrDisabled) {
-      optimalReason = `At ${tripsPerMonth} trips/month the unlimited pass at $105 is the right choice. Pay-per-ride would cost $${ctaPayPerRideMonthly}/mo — more expensive.`;
+    if (bill.mode === "cta-monthly" && tripsPerMonth >= CTA_BREAKEVEN && !isSeniorOrDisabled) {
+      optimalReason = `At ${tripsPerMonth} trips/month the 30-day pass at $${CTA_UNLIMITED} is the right choice. Pay-per-ride would cost $${ctaPayPerRideMonthly}/mo — more expensive.`;
     } else if (bill.mode === "cta-reduced") {
       optimalReason = "You're already on the reduced fare program — the best available CTA rate for eligible riders.";
     } else if (bill.mode.startsWith("metra") && bill.commute === "suburb-loop") {
@@ -394,7 +398,7 @@ export function analyzeTransit(
     annualSaving: r2((bill.cost - rec.cost) * 12),
     discountApplied: isSeniorOrDisabled || isLowincome,
     alreadyOptimal: false,
-    note: "Fares sourced from official CTA.com and Metra.com 2024 fare tables.",
+    note: "Fares sourced from official transitchicago.com and Metra.com 2026 fare tables.",
     dataFreshness: DATA_FRESHNESS,
   };
 }
@@ -432,11 +436,11 @@ export function analyzeInsurance(
   if (!best) {
     let optimalReason = "";
     if (insKey === "renters" && bill.cost <= 12) {
-      optimalReason = `At $${bill.cost}/mo you're already paying a competitive rate for Loop renters insurance. Lemonade's floor is ~$9/mo for standard coverage.`;
+      optimalReason = `At $${bill.cost}/mo you're already paying a competitive rate for Loop renters insurance. Lemonade averages ~$12/mo for standard coverage in Chicago.`;
     } else if (insKey === "auto" && bill.cost <= 90) {
       optimalReason = `At $${bill.cost}/mo your auto insurance is already in the competitive range for Chicago. Usage-based options (Root) can sometimes go lower if you drive under 6,000 miles/year.`;
     } else if (insKey === "health") {
-      optimalReason = `At $${bill.cost}/mo, ensure you've checked ACA subsidy eligibility at healthcare.gov — income-qualified Loop residents often pay $0-80/mo after APTC credits.`;
+      optimalReason = `At $${bill.cost}/mo, make sure you've checked subsidy eligibility at getcoveredillinois.gov — eligible Illinois enrollees paid ~$142/mo on average after premium tax credits in 2026.`;
     } else {
       optimalReason = `At $${bill.cost}/mo your ${insKey} insurance is already competitive. No cheaper plan with equivalent coverage was found.`;
     }
@@ -477,7 +481,7 @@ export function analyzeInsurance(
     discountPct: discMult > 0 ? pct(discMult) : undefined,
     alreadyOptimal: false,
     note: insKey === "health"
-      ? "⚠️ Health premiums shown are benchmark rates (~35yo, no ACA subsidy). Check healthcare.gov — most Loop residents qualify for lower rates based on income."
+      ? "⚠️ Health premiums shown are 2026 Illinois estimates (~40yo, before subsidies). Check getcoveredillinois.gov — 8 in 10 Illinois enrollees qualify for lower rates based on income."
       : undefined,
     warning: best.warnings,
     dataFreshness: DATA_FRESHNESS,
